@@ -68,7 +68,8 @@ def setup_dataset(args):
         gt_dir = "../data/custom/Annotations"
 
         val_flow_dir = "../data/custom/Flows_gap1"
-        val_seq = [""]
+        val_seq = ["breakdance"]
+        # val_seq = [""]
         val_data_dir = [val_flow_dir, img_dir, gt_dir]
         res = "480p"
 

@@ -52,22 +52,24 @@ def predict(args):
     model.load_state_dict(torch.load(args.model))
     model = model.module
 
-    print(f"DEVICE: {DEVICE}")
+    # print(f"args.path: {args.path}")
+
+    # print(f"DEVICE: {DEVICE}")
 
     model.to(DEVICE)
     model.eval()
 
     with torch.no_grad():
-        img_path1 = args.path + "/breakdance/*.png"
-        img_path2 = args.path + "/breakdance/*.jpg"
+        # img_path1 = args.path + "/breakdance/*.png"
+        # img_path2 = args.path + "/breakdance/*.jpg"
         # img_path1 = args.path + "/*/*.png"
         # img_path2 = args.path + "/*/*.jpg"
-        # img_path1 = os.path.join(args.path, "*.png")
-        # img_path2 = os.path.join(args.path, "*.jpg")
+        img_path1 = os.path.join(args.path, "*.png")
+        img_path2 = os.path.join(args.path, "*.jpg")
         images = glob.glob(img_path1) + glob.glob(img_path2)
 
-        # print(f"glob path: {img_path1}")
-        # print(f"glob1: {img_path2}")
+        print(f"img_path1: {img_path1}")
+        print(f"img_path2: {img_path2}")
 
         # print(f"images: {images}")
 
