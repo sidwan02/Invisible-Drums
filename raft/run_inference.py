@@ -32,11 +32,13 @@ def run_inference(args):
                     outroot = data_path + "/FlowImages_gap{}/".format(
                         g
                     )  # where to save the image flow
+
+                clear_flag = "--clear" if args.clear else ""
                 os.system(
                     "python predict.py "
                     "--gap {} --model {} --path {} "
-                    "--outroot {} --reverse {} --raw_outroot {}".format(
-                        g, mode, f, outroot, r, raw_outroot
+                    "--outroot {} --reverse {} --raw_outroot {} {}".format(
+                        g, mode, f, outroot, r, raw_outroot, clear_flag
                     )
                 )
 

@@ -8,6 +8,7 @@ import glob
 import torch
 import argparse
 import numpy as np
+import shutil
 
 import PIL
 from PIL import Image
@@ -77,8 +78,15 @@ def predict(args):
         floout = os.path.join(args.outroot, folder)
         rawfloout = os.path.join(args.raw_outroot, folder)
 
+        if args.clear and os.path.exists(floout):
+            shutil.rmtree(floout)
         os.makedirs(floout, exist_ok=True)
+
+        if args.clear and os.path.exists(rawfloout):
+            shutil.rmtree(rawfloout)
         os.makedirs(rawfloout, exist_ok=True)
+
+        return
 
         gap = args.gap
         images = sorted(images)
@@ -131,6 +139,8 @@ if __name__ == "__main__":
         action="store_true",
         help="use efficent correlation implementation",
     )
+    parser.add_argument("--clear", action=argparse.BooleanOptionalAction)
+
     args = parser.parse_args()
 
     print("about to predict")
