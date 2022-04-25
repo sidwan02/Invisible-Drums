@@ -7,6 +7,8 @@ reverse = [0, 1]
 rgbpath = data_path + "/JPEGImages"  # path to the dataset
 folder = gb.glob(os.path.join(rgbpath, "*"))
 
+print(f"folder: {folder}")
+
 for r in reverse:
     for g in gap:
         for f in folder:

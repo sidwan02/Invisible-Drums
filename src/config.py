@@ -64,11 +64,11 @@ def setup_dataset(args):
     pairs = [1, 2, -1, -2]
     if args.dataset == "DAVIS":
 
-        basepath = "/path/to/SlotAttention/data/DAVIS2016"
-        img_dir = "/path/to/SlotAttention/data/DAVIS2016/JPEGImages/480p"
-        gt_dir = "/path/to/SlotAttention/data/DAVIS2016/Annotations/480p"
+        basepath = "../data/DAVIS2016"
+        img_dir = "../data/DAVIS2016/JPEGImages/480p"
+        gt_dir = "../data/DAVIS2016/Annotations/480p"
 
-        val_flow_dir = "/path/to/SlotAttention/data/DAVIS2016/Flows_gap1/1080p"
+        val_flow_dir = "../data/DAVIS2016/Flows_gap1/1080p"
         val_seq = [
             "dog",
             "cows",
@@ -286,6 +286,8 @@ def setup_dataset(args):
             )
             flowpairs += [flowpair]
         flow_dir["gap_{}_{}".format(p1, p2)] = flowpairs
+
+    print("iterated over all folders")
 
     # flow_dir is a dictionary, with keys indicating the flow gap, and each value is a list of sequence names,
     # each item then is an array with Nx2, N indicates the number of available pairs.
