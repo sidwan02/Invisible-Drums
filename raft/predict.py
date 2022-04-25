@@ -69,8 +69,12 @@ def predict(args):
         img_path2 = os.path.join(args.path, "*.jpg")
         images = glob.glob(img_path1) + glob.glob(img_path2)
 
-        print(f"img_path1: {img_path1}")
-        print(f"img_path2: {img_path2}")
+        # print(f"img_path1: {img_path1}")
+        # print(f"img_path2: {img_path2}")
+
+        # print(f"images len: {len(images)}")
+
+        return
 
         # print(f"images: {images}")
 
@@ -85,8 +89,6 @@ def predict(args):
         if args.clear and os.path.exists(rawfloout):
             shutil.rmtree(rawfloout)
         os.makedirs(rawfloout, exist_ok=True)
-
-        return
 
         gap = args.gap
         images = sorted(images)

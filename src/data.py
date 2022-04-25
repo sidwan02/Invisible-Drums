@@ -1,4 +1,5 @@
 import os
+from os import path
 import cv2
 import glob
 import torch
@@ -104,13 +105,20 @@ class FlowEval(Dataset):
 
         self.samples = []
         for v in self.val_seq:
+
+            base_name_samples = [
+                path.join(v, path.basename(rel_path))
+                for rel_path in glob.glob(os.path.join(self.data_dir[1], v, "*.jpg"))
+            ]
+
             self.samples.extend(
-                sorted(glob.glob(os.path.join(self.data_dir[1], v, "*.jpg")))
+                sorted(base_name_samples)
+                # sorted(glob.glob(os.path.join(self.data_dir[1], v, "*.jpg")))
             )
 
-        self.samples = [
-            os.path.join(x.split("/")[-2], x.split("/")[-1]) for x in self.samples
-        ]
+        # self.samples = [
+        #     os.path.join(x.split("/")[-2], x.split("/")[-1]) for x in self.samples
+        # ]
         self.gaps = ["gap{}".format(i) for i in pair_list]
         self.neg_gaps = ["gap{}".format(-i) for i in pair_list]
 
@@ -121,8 +129,14 @@ class FlowEval(Dataset):
         out = []
         fgap = []
         for gap, _gap in zip(self.gaps, self.neg_gaps):
+            # print(f"self.samples[idx]: {self.samples[idx]}")
+
+            img_name = self.samples[idx]
+            # img_name = self.samples[idx].split("\\")[-1]
+            print(f"img_name: {img_name}")
+
             flow_dir = (
-                os.path.join(self.data_dir[0], self.samples[idx])
+                os.path.join(self.data_dir[0], img_name)
                 .replace("gap1", gap)
                 .replace(".jpg", ".flo")
             )
@@ -134,7 +148,7 @@ class FlowEval(Dataset):
                 fgap.append(gap)
             else:
                 flow_dir = (
-                    os.path.join(self.data_dir[0], self.samples[idx])
+                    os.path.join(self.data_dir[0], img_name)
                     .replace("gap1", _gap)
                     .replace(".jpg", ".flo")
                 )
@@ -143,11 +157,9 @@ class FlowEval(Dataset):
         out = np.stack(out, 0)
 
         if self.with_rgb:
-            rgb_dir = os.path.join(self.data_dir[1], self.samples[idx])
+            rgb_dir = os.path.join(self.data_dir[1], img_name)
             out = np.stack([out, readRGB(rgb_dir, self.resolution)], -1)
 
-        gt_dir = os.path.join(self.data_dir[2], self.samples[idx]).replace(
-            ".jpg", ".png"
-        )
+        gt_dir = os.path.join(self.data_dir[2], img_name).replace(".jpg", ".png")
         img_dir = gt_dir.split("/")[-2:]
         return out, readSeg(gt_dir), img_dir, fgap
