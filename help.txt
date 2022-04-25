@@ -1,4 +1,8 @@
 cd raft/
+python run_inference.py
 
+cd ..
 
+cd src/
 python eval.py --dataset DAVIS --flow_to_rgb --resume_path ../models/ckpt_davis.pth
+python eval.py --dataset custom --flow_to_rgb --resume_path ../models/ckpt_davis.pth

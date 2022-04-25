@@ -127,7 +127,7 @@ def main(args):
     # setup log and model path, initialize tensorboard,
     [logPath, modelPath, resultsPath] = cg.setup_path(args)
 
-    print("about to intialize dataloader")
+    print("about to initialize dataloader")
     # initialize dataloader (validation bsz has to be 1 for FBMS, because of different resolutions, otherwise, can be >1)
     (
         trn_dataset,
@@ -223,7 +223,7 @@ if __name__ == "__main__":
         "--dataset",
         type=str,
         default="DAVIS",
-        choices=["DAVIS", "MoCA", "FBMS", "STv2"],
+        choices=["DAVIS", "MoCA", "FBMS", "STv2", "custom"],
     )
     parser.add_argument("--with_rgb", action="store_true")
     parser.add_argument("--flow_to_rgb", action="store_true")

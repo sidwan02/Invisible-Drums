@@ -1,3 +1,7 @@
-import torch
+import glob
+import os
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+v = ""
+a = glob.glob(os.path.join("../data/custom/JPEGImages", v, "*.jpg"))
+
+print(a)

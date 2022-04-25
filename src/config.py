@@ -62,7 +62,17 @@ def setup_dataset(args):
     res = ""
     with_gt = True
     pairs = [1, 2, -1, -2]
-    if args.dataset == "DAVIS":
+    if args.dataset == "custom":
+        basepath = "../data/custom"
+        img_dir = "../data/custom/JPEGImages"
+        gt_dir = "../data/custom/Annotations"
+
+        val_flow_dir = "../data/custom/Flows_gap1"
+        val_seq = [""]
+        val_data_dir = [val_flow_dir, img_dir, gt_dir]
+        res = "480p"
+
+    elif args.dataset == "DAVIS":
 
         basepath = "../data/DAVIS2016"
         img_dir = "../data/DAVIS2016/JPEGImages/480p"
