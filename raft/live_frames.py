@@ -14,12 +14,26 @@ def main(args):
     while cap.isOpened:
 
         ret, frame = cap.read()
+        cv2.imshow(windowName, frame)
+
+        orig_shape = frame.shape
+
+        scale_factor = 1
+
+        frame = cv2.resize(
+            frame,
+            (frame.shape[1] // scale_factor, frame.shape[0] // scale_factor),
+            cv2.INTER_NEAREST,
+        )
+
+        print(frame.shape)
 
         image_flow = predict_live(args, prev_frame, frame)
 
-        cv2.imshow(windowName, frame)
-
-        if image_flow:
+        if image_flow is not None:
+            image_flow = cv2.resize(
+                image_flow, (orig_shape[1], orig_shape[0]), cv2.INTER_NEAREST
+            )
             cv2.imshow("Image Flow", image_flow)
 
         prev_frame = frame
