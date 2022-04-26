@@ -3,6 +3,14 @@ modify src/config.py if necessary
 cd raft/
 python run_inference.py
 
+# implicitly
+python predict.py "
+                    "--gap {} --model {} --path {} "
+                    "--outroot {} --reverse {} --raw_outroot {} {}".format(
+                        g, mode, f, outroot, r, raw_outroot, clear_flag
+                    )
+# implicitly
+
 cd ..
 
 cd src/

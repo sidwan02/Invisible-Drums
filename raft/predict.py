@@ -122,6 +122,28 @@ def predict(args):
             cv2.imwrite(flopath[:-4] + ".png", flo[:, :, [2, 1, 0]])
 
 
+# image1 @ t; image2 @ t + 1
+def predict_live(args, image1, image2):
+    model = torch.nn.DataParallel(RAFT(args))
+    model.load_state_dict(torch.load(args.model))
+    model = model.module
+
+    model.to(DEVICE)
+    model.eval()
+
+    with torch.no_grad():
+
+        padder = InputPadder(image1.shape)
+        image1, image2 = padder.pad(image1, image2)
+
+        flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
+
+        flo = flow_up[0].permute(1, 2, 0).cpu().numpy()
+
+        flo = flow_viz.flow_to_image(flo)
+        return flo[:, :, [2, 1, 0]]
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # parser.add_argument('--resolution', nargs='+', type=int)
