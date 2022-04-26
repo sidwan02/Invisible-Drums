@@ -39,6 +39,14 @@ def writeFlowFile(filename, uv):
         f.write(uv.tobytes())
 
 
+def load_image_live(img, resolution=None):
+    if resolution:
+        img = img.resize(resolution, PIL.Image.ANTIALIAS)
+    img = np.array(img).astype(np.uint8)
+    img = torch.from_numpy(img).permute(2, 0, 1).float()
+    return img[None].to(DEVICE)
+
+
 def load_image(imfile, resolution=None):
     img = Image.open(imfile)
     if resolution:
@@ -124,6 +132,9 @@ def predict(args):
 
 # image1 @ t; image2 @ t + 1
 def predict_live(args, image1, image2):
+    if image1 is None:
+        return None
+
     model = torch.nn.DataParallel(RAFT(args))
     model.load_state_dict(torch.load(args.model))
     model = model.module
@@ -132,6 +143,9 @@ def predict_live(args, image1, image2):
     model.eval()
 
     with torch.no_grad():
+
+        image1 = load_image_live(image1)
+        image2 = load_image_live(image2)
 
         padder = InputPadder(image1.shape)
         image1, image2 = padder.pad(image1, image2)
