@@ -1,7 +1,13 @@
 modify src/config.py if necessary
 
 cd raft/
-python run_inference.py
 
+# NON-LIVE
+
+python run_inference.py
+python 
+
+
+# LIVE
 
 python live_frames.py --model raft-things.pth

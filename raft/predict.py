@@ -82,7 +82,7 @@ def predict(args):
 
         # print(f"images len: {len(images)}")
 
-        return
+        # return
 
         # print(f"images: {images}")
 
