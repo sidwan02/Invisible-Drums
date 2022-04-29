@@ -1,5 +1,8 @@
 from argparse import ArgumentParser
 
+def place_centroids(img):
+    
+    
 
 def main(args):
     # os.system(f"python run_inference.py")
@@ -29,7 +32,7 @@ def main(args):
 
             flopath = os.path.join(floout, os.path.basename(svfile))
 
-            processed_img = None
+            processed_img = place_centroids(image1)
 
             cv2.imwrite(flopath[:-4] + ".png", processed_img)
 
