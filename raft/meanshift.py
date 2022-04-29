@@ -60,18 +60,18 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
     )
 
 
-def mean_shift_custom(image, n_points=10, n_iter=50, radius=50):
+def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
     image = np.array(image)
-    w, h = image.shape
+    h, w = image.shape
 
-    print(f"w: {w}, h: {h}")
+    # print(f"w: {w}, h: {h}")
 
     points = np.array(
         [
-            (x, y)
-            for x, y in zip(
-                random.sample(range(0, w), n_points),
+            (r, c)
+            for r, c in zip(
                 random.sample(range(0, h), n_points),
+                random.sample(range(0, w), n_points),
             )
         ]
     )
