@@ -38,4 +38,7 @@ ax.scatter(
     zorder=10,
 )
 
+ax.xlim([0, w])
+ax.ylim([0, h])
+
 # plt.show()

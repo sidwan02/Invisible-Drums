@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, BooleanOptionalAction
-from sklearn.cluster import MeanShift
+from sklearn.cluster import MeanShift, MiniBatchKMeans
 import cv2
 import matplotlib.pyplot as plt
 import glob
@@ -23,12 +23,20 @@ def place_centroids(img):
     print(f"img.shape: {img.shape}")
 
     grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite("grayscale.png", grayscale)
+
     h, w = len(grayscale), len(grayscale[0])
 
     intensity_weighted_pixels = []
 
+    def intensity_to_weight(intensity):
+        # 255 => while; # 0 => black
+        return (255 - intensity) // 8
+
     [
-        intensity_weighted_pixels.append([[r, c]] * grayscale[r][c])
+        intensity_weighted_pixels.append(
+            [[r, c]] * (intensity_to_weight(grayscale[r][c]))
+        )
         for r in range(h)
         for c in range(w)
     ]
@@ -39,24 +47,51 @@ def place_centroids(img):
 
     print(f"X.shape: {X.shape}")
 
-    # --> only for debugging purposes
+    # # --> only for debugging purposes
     fig = plt.figure()
 
     ax = fig.add_subplot(111)
 
-    ax.scatter(X[:, 0], X[:, 1], marker="o", alpha=0.1)
+    ax.set_xlim([0, w])
+    ax.set_ylim([0, h])
+
+    # ax.scatter(X[:, 0], X[:, 1], marker=",", alpha=0.01, color="black")
 
     # plt.show()
 
-    plt.savefig("saved_figure.png")
+    # # plt.savefig("saved_figure.png")
 
-    assert 1 == 0
-    # --> only for debugging purposes
+    # assert 1 == 0
+    # # --> only for debugging purposes
 
-    ms = MeanShift()
-    ms.fit(X)
+    # --> Attempt MeanShift
 
-    cluster_centers = ms.cluster_centers_
+    # ms = MeanShift()
+    # ms.fit(X)
+    # cluster_centers = ms.cluster_centers_
+
+    # Attempt MeanShift <--
+
+    # --> Attempt KMeans
+
+    clusters = MiniBatchKMeans(n_clusters=5).fit(X)
+    cluster_centers = clusters.cluster_centers_
+
+    ax.scatter(
+        cluster_centers[:, 0],
+        cluster_centers[:, 1],
+        marker="x",
+        color="red",
+        s=300,
+        linewidth=5,
+        zorder=10,
+    )
+
+    plt.show()
+
+    # Attempt KMeans <--
+
+    print(f"cluster_centers: {cluster_centers}")
 
 
 def main(args):
