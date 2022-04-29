@@ -16,7 +16,9 @@ X, _ = make_blobs(n_samples=150, centers=clusters, cluster_std=0.60)
 # coordinates for the cluster centers
 ms = MeanShift()
 ms.fit(X)
+
 cluster_centers = ms.cluster_centers_
+print(ms.labels_)
 
 # Finally We plot the data points
 # and centroids in a 3D graph.
@@ -36,4 +38,4 @@ ax.scatter(
     zorder=10,
 )
 
-plt.show()
+# plt.show()

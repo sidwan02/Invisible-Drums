@@ -1,8 +1,42 @@
 from argparse import ArgumentParser
+from sklearn.cluster import MeanShift
+import cv2
+import matplotlib.pyplot as plt
+
 
 def place_centroids(img):
-    
-    
+
+    grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    h, w = len(grayscale), len(grayscale[0])
+
+    intensity_weighted_pixels = []
+
+    [
+        intensity_weighted_pixels.append([r, c] * grayscale[r][c])
+        for r in range(h)
+        for c in range(w)
+    ]
+
+    X = chain(*intensity_weighted_pixels)
+
+    # --> only for debugging purposes
+    fig = plt.figure()
+
+    ax = fig.add_subplot(111)
+
+    ax.scatter(X[:, 0], X[:, 1], marker="o", alpha=0.1)
+
+    plt.show()
+
+    assert 1 == 0
+    # --> only for debugging purposes
+
+    ms = MeanShift()
+    ms.fit(X)
+
+
+cluster_centers = ms.cluster_centers_
+
 
 def main(args):
     # os.system(f"python run_inference.py")
