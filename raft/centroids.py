@@ -7,6 +7,7 @@ import os
 import numpy as np
 from PIL import Image
 from itertools import chain
+from meanshift import mean_shift_custom
 
 
 def load_image(imfile, resolution=None):
@@ -68,6 +69,14 @@ def place_centroids(img):
     """
 
     # """
+    # --> Attempt mean_shift_custom
+
+    cluster_centers = mean_shift_custom(grayscale)
+
+    # Attempt MeanShift <--
+    # """
+
+    """
     # --> Attempt KMeans
 
     clusters = MiniBatchKMeans(n_clusters=5).fit(X)

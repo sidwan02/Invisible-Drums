@@ -2,3 +2,5 @@ data/
 # data/DAVIS2016/
 # data/custom/Flow*
 # data/custom/JPEGImages/
+
+raft/centroids/

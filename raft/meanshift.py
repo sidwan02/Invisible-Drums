@@ -4,6 +4,9 @@ from sklearn.cluster import MeanShift
 from sklearn.datasets import make_blobs
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import random
+import cv2
+import copy
 
 # We will be using the make_blobs method
 # in order to generate our own data.
@@ -44,41 +47,68 @@ def POC():
     # plt.show()
 
 
-def thing(image, n_points=10, n_iter=100, radius=10):
-    image = np.array(image)
-    w, h = image.shape
-    intensities = [[0] * w for _ in range(h)]
+def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
+    grayscale_w_centroids = grayscale
+    for (r, c) in cluster_centers:
+        r, c = round(r), round(c)
+        grayscale_w_centroids = cv2.circle(
+            grayscale_w_centroids, (r, c), radius=10, color=(0, 0, 255), thickness=10
+        )
 
-    points = np.array(
-        [
-            (x, y)
-            for x, y in zip(
-                random.sample((0, w), n_points), random.sample((0, h), n_points)
-            )
-        ]
+    cv2.imwrite(
+        f"centroids/grayscale_centroids{img_name_suff}.png", grayscale_w_centroids
     )
 
-    cur_score = [0] * n_points
+
+def mean_shift_custom(image, n_points=1, n_iter=100, radius=10):
+    image = np.array(image)
+    w, h = image.shape
+
+    print(f"w: {w}, h: {h}")
+
+    intensities = [[0] * w for _ in range(h)]
+
+    # points = np.array(
+    #     [
+    #         (x, y)
+    #         for x, y in zip(
+    #             random.sample(range(0, w), n_points),
+    #             random.sample(range(0, h), n_points),
+    #         )
+    #     ]
+    # )
+    points = np.array([[300, 200]])
+
+    mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-0")
 
     cur_iter = 1
 
     while cur_iter <= n_iter:
         for i, (r, c) in enumerate(points):
-            r, y = round(r), round(c)
+            r, c = round(r), round(c)
 
             min_r, max_r = max(0, r - 10), min(h, r + 10)
             min_c, max_c = max(0, c - 10), min(w, c + 10)
 
+            print(f"surr_r: [{min_r}, {max_r}]")
+            print(f"surr_c: [{min_c}, {max_c}]")
+
             a = np.array(
                 [
                     [surr_r, surr_c]
-                    for rr in range(min_r, max_r + 1)
-                    for cc in range(min_c, max_c + 1)
+                    for surr_r in range(min_r, max_r + 1)
+                    for surr_c in range(min_c, max_c + 1)
                 ]
             )
             # 255 => white; # 0 => black
-            b = 255 - image[min_r : max_r + 1, min_c : max_c + 1]
+            b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
+
+            print(f"a.shape: {a.shape}, b.shape: {b.shape}")
 
             points[i] = sum(a * np.expand_dims(b, axis=1)) / sum(b)
 
+        mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-{cur_iter}")
+
         cur_iter += 1
+
+    return points
