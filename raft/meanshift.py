@@ -52,21 +52,19 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
     for (r, c) in cluster_centers:
         r, c = round(r), round(c)
         grayscale_w_centroids = cv2.circle(
-            grayscale_w_centroids, (r, c), radius=10, color=(0, 0, 255), thickness=10
+            grayscale_w_centroids, (c, r), radius=1, color=(0, 0, 255), thickness=10
         )
 
     cv2.imwrite(
-        f"centroids/grayscale_centroids{img_name_suff}.png", grayscale_w_centroids
+        f"centroid_imgs/grayscale_centroids{img_name_suff}.png", grayscale_w_centroids
     )
 
 
-def mean_shift_custom(image, n_points=1, n_iter=100, radius=10):
+def mean_shift_custom(image, n_points=1, n_iter=10, radius=50):
     image = np.array(image)
     w, h = image.shape
 
     print(f"w: {w}, h: {h}")
-
-    intensities = [[0] * w for _ in range(h)]
 
     # points = np.array(
     #     [
@@ -87,8 +85,8 @@ def mean_shift_custom(image, n_points=1, n_iter=100, radius=10):
         for i, (r, c) in enumerate(points):
             r, c = round(r), round(c)
 
-            min_r, max_r = max(0, r - 10), min(h, r + 10)
-            min_c, max_c = max(0, c - 10), min(w, c + 10)
+            min_r, max_r = max(0, r - radius), min(h, r + radius)
+            min_c, max_c = max(0, c - radius), min(w, c + radius)
 
             print(f"surr_r: [{min_r}, {max_r}]")
             print(f"surr_c: [{min_c}, {max_c}]")
@@ -101,7 +99,15 @@ def mean_shift_custom(image, n_points=1, n_iter=100, radius=10):
                 ]
             )
             # 255 => white; # 0 => black
-            b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
+            # b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
+
+            b = 255 - np.array(
+                [
+                    image[surr_r, surr_c]
+                    for surr_r in range(min_r, max_r + 1)
+                    for surr_c in range(min_c, max_c + 1)
+                ]
+            )
 
             print(f"a.shape: {a.shape}, b.shape: {b.shape}")
 

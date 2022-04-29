@@ -26,27 +26,27 @@ def place_centroids(img):
     grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imwrite("grayscale.png", grayscale)
 
-    h, w = len(grayscale), len(grayscale[0])
+    # h, w = len(grayscale), len(grayscale[0])
 
-    intensity_weighted_pixels = []
+    # intensity_weighted_pixels = []
 
-    def intensity_to_weight(intensity):
-        # 255 => while; # 0 => black
-        return (255 - intensity) // 50
+    # def intensity_to_weight(intensity):
+    #     # 255 => while; # 0 => black
+    #     return (255 - intensity) // 50
 
-    [
-        intensity_weighted_pixels.append(
-            [[r, c]] * (intensity_to_weight(grayscale[r][c]))
-        )
-        for r in range(h)
-        for c in range(w)
-    ]
+    # [
+    #     intensity_weighted_pixels.append(
+    #         [[r, c]] * (intensity_to_weight(grayscale[r][c]))
+    #     )
+    #     for r in range(h)
+    #     for c in range(w)
+    # ]
 
-    # print(f"intensity_weighted_pixels: {intensity_weighted_pixels}")
+    # # print(f"intensity_weighted_pixels: {intensity_weighted_pixels}")
 
-    X = np.array(list(chain(*intensity_weighted_pixels)))
+    # X = np.array(list(chain(*intensity_weighted_pixels)))
 
-    print(f"X.shape: {X.shape}")
+    # print(f"X.shape: {X.shape}")
 
     # --> only for debugging purposes
     # ax.scatter(X[:, 0], X[:, 1], marker=",", alpha=0.01, color="black")
