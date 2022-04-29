@@ -47,14 +47,7 @@ def place_centroids(img):
 
     print(f"X.shape: {X.shape}")
 
-    # # --> only for debugging purposes
-    fig = plt.figure()
-
-    ax = fig.add_subplot(111)
-
-    ax.set_xlim([0, w])
-    ax.set_ylim([0, h])
-
+    # --> only for debugging purposes
     # ax.scatter(X[:, 0], X[:, 1], marker=",", alpha=0.01, color="black")
 
     # plt.show()
@@ -62,7 +55,7 @@ def place_centroids(img):
     # # plt.savefig("saved_figure.png")
 
     # assert 1 == 0
-    # # --> only for debugging purposes
+    # only for debugging purposes <--
 
     # --> Attempt MeanShift
 
@@ -76,20 +69,37 @@ def place_centroids(img):
 
     clusters = MiniBatchKMeans(n_clusters=5).fit(X)
     cluster_centers = clusters.cluster_centers_
-
-    ax.scatter(
-        cluster_centers[:, 0],
-        cluster_centers[:, 1],
-        marker="x",
-        color="red",
-        s=300,
-        linewidth=5,
-        zorder=10,
-    )
-
-    plt.show()
-
     # Attempt KMeans <--
+
+    grayscale_w_centroids = grayscale
+    for (x, y) in cluster_centers:
+        x, y = round(x), round(y)
+        grayscale_w_centroids = cv2.circle(
+            grayscale_w_centroids, (x, y), radius=10, color=(0, 0, 255), thickness=10
+        )
+
+    cv2.imwrite("grayscale_centroids.png", grayscale_w_centroids)
+    # --> only for debugging purposes
+
+    # fig = plt.figure()
+
+    # ax = fig.add_subplot(111)
+
+    # ax.set_xlim([0, w])
+    # ax.set_ylim([0, h])
+
+    # ax.scatter(
+    #     cluster_centers[:, 0],
+    #     cluster_centers[:, 1],
+    #     marker="x",
+    #     color="red",
+    #     s=300,
+    #     linewidth=5,
+    #     zorder=10,
+    # )
+
+    # plt.show()
+    # only for debugging purposes <--
 
     print(f"cluster_centers: {cluster_centers}")
 
