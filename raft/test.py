@@ -1,6 +1,5 @@
-import glob
-import os
+from itertools import chain
 
-path = "../data/DAVIS2016/JPEGImages/480p/*/*.jpg"
-print(f"path: {path}")
-print(glob.glob(path, recursive=False))
+a = [[[1, 2], [1, 2], [1, 2]], [[1, 3], [1, 3]]]
+
+print(a)

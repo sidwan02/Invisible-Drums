@@ -5,8 +5,8 @@ cd raft/
 # NON-LIVE
 
 python run_inference.py
-python 
 
+python centroids.py
 
 # LIVE
 
