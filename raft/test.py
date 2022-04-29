@@ -1,5 +1,9 @@
-from itertools import chain
+import numpy as np
 
-a = [[[1, 2], [1, 2], [1, 2]], [[1, 3], [1, 3]]]
+a = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
 
-print(a)
+b = np.array([1, 1, 1, 1])
+
+c = sum(a * np.expand_dims(b, axis=1)) / sum(b)
+
+print(c)

@@ -31,7 +31,7 @@ def place_centroids(img):
 
     def intensity_to_weight(intensity):
         # 255 => while; # 0 => black
-        return (255 - intensity) // 8
+        return (255 - intensity) // 50
 
     [
         intensity_weighted_pixels.append(
@@ -57,19 +57,24 @@ def place_centroids(img):
     # assert 1 == 0
     # only for debugging purposes <--
 
+    """
     # --> Attempt MeanShift
 
-    # ms = MeanShift()
-    # ms.fit(X)
-    # cluster_centers = ms.cluster_centers_
+    ms = MeanShift(max_iter=0)
+    ms.fit(X)
+    cluster_centers = ms.cluster_centers_
 
     # Attempt MeanShift <--
+    """
 
+    # """
     # --> Attempt KMeans
 
     clusters = MiniBatchKMeans(n_clusters=5).fit(X)
     cluster_centers = clusters.cluster_centers_
+
     # Attempt KMeans <--
+    # """
 
     grayscale_w_centroids = grayscale
     for (x, y) in cluster_centers:
@@ -79,29 +84,34 @@ def place_centroids(img):
         )
 
     cv2.imwrite("grayscale_centroids.png", grayscale_w_centroids)
+
+    """
     # --> only for debugging purposes
 
-    # fig = plt.figure()
+    fig = plt.figure()
 
-    # ax = fig.add_subplot(111)
+    ax = fig.add_subplot(111)
 
-    # ax.set_xlim([0, w])
-    # ax.set_ylim([0, h])
+    ax.set_xlim([0, w])
+    ax.set_ylim([0, h])
 
-    # ax.scatter(
-    #     cluster_centers[:, 0],
-    #     cluster_centers[:, 1],
-    #     marker="x",
-    #     color="red",
-    #     s=300,
-    #     linewidth=5,
-    #     zorder=10,
-    # )
+    ax.scatter(
+        cluster_centers[:, 0],
+        cluster_centers[:, 1],
+        marker="x",
+        color="red",
+        s=300,
+        linewidth=5,
+        zorder=10,
+    )
 
     # plt.show()
     # only for debugging purposes <--
+    """
 
     print(f"cluster_centers: {cluster_centers}")
+
+    assert 0 == 1
 
 
 def main(args):
