@@ -60,27 +60,28 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
     )
 
 
-def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
+def mean_shift_custom(image, n_points=1, n_iter=50, radius=50):
     image = np.array(image)
     h, w = image.shape
 
     # print(f"w: {w}, h: {h}")
 
-    points = np.array(
-        [
-            (r, c)
-            for r, c in zip(
-                random.sample(range(0, h), n_points),
-                random.sample(range(0, w), n_points),
-            )
-        ]
-    )
+    # points = np.array(
+    #     [
+    #         (r, c)
+    #         for r, c in zip(
+    #             random.sample(range(0, h), n_points),
+    #             random.sample(range(0, w), n_points),
+    #         )
+    #     ]
+    # )
+    points = np.array([[300, 600]])
 
     radius_orig = radius
 
-    # print(f"points: {points}")
+    points_radii = [radius_orig] * n_points
 
-    # points = np.array([[300, 200]])
+    # print(f"points: {points}")
 
     mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-0")
 
@@ -89,47 +90,44 @@ def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
     while cur_iter <= n_iter:
         print(f"cur_iter: {cur_iter}")
         for i, (r, c) in enumerate(points):
-            loop_count = 1
-            radius = radius_orig
-            did_not_shift = True
-            while did_not_shift and loop_count <= 50:
-                r, c = round(r), round(c)
+            r, c = round(r), round(c)
 
-                min_r, max_r = max(0, r - radius), min(h - 1, r + radius)
-                min_c, max_c = max(0, c - radius), min(w - 1, c + radius)
+            min_r, max_r = max(0, r - points_radii[i]), min(h - 1, r + points_radii[i])
+            min_c, max_c = max(0, c - points_radii[i]), min(w - 1, c + points_radii[i])
 
-                # print(f"surr_r: [{min_r}, {max_r}]")
-                # print(f"surr_c: [{min_c}, {max_c}]")
+            # print(f"surr_r: [{min_r}, {max_r}]")
+            # print(f"surr_c: [{min_c}, {max_c}]")
 
-                a = np.array(
-                    [
-                        [surr_r, surr_c]
-                        for surr_r in range(min_r, max_r + 1)
-                        for surr_c in range(min_c, max_c + 1)
-                    ]
-                )
-                # 255 => white; # 0 => black
-                # b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
+            a = np.array(
+                [
+                    [surr_r, surr_c]
+                    for surr_r in range(min_r, max_r + 1)
+                    for surr_c in range(min_c, max_c + 1)
+                ]
+            )
+            # 255 => white; # 0 => black
+            # b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
 
-                b = 255 - np.array(
-                    [
-                        image[surr_r, surr_c]
-                        for surr_r in range(min_r, max_r + 1)
-                        for surr_c in range(min_c, max_c + 1)
-                    ]
-                )
+            b = 255 - np.array(
+                [
+                    image[surr_r, surr_c]
+                    for surr_r in range(min_r, max_r + 1)
+                    for surr_c in range(min_c, max_c + 1)
+                ]
+            )
 
-                # print(f"a.shape: {a.shape}, b.shape: {b.shape}")
+            # print(f"a.shape: {a.shape}, b.shape: {b.shape}")
 
-                # if sum(b) != 0:
-                if np.average(b) > 50:
-                    points[i] = sum(a * np.expand_dims(b, axis=1)) / sum(b)
-                    did_not_shift = False
-                else:
-                    radius *= 2
-                    loop_count += 1
+            # if True:
+            if np.average(b) < 10:
+                points_radii[i] *= 2
+            else:
+                points_radii[i] = radius_orig
 
-                # if the sum is 0 that means all surrounding pixels are pure white 255. For now if that's the case don't update points which makes sense logically speaking
+            if sum(b) != 0:
+                points[i] = sum(a * np.expand_dims(b, axis=1)) / sum(b)
+
+            # if the sum is 0 that means all surrounding pixels are pure white 255. For now if that's the case don't update points which makes sense logically speaking
 
         mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-{cur_iter}")
 
