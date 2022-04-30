@@ -60,7 +60,7 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
 
 
 def mean_shift_custom(
-    image, n_points=50, n_iter=5, radius=50, centroids_path=None, meanshift_path=None
+    image, n_points=50, n_iter=50, radius=50, centroids_path=None, meanshift_path=None
 ):
     image = np.array(image)
     h, w = image.shape

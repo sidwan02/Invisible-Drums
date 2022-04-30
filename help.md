@@ -1,8 +1,8 @@
 modify src/config.py if necessary
 
-cd raft/
-
 # NON-LIVE
+
+<!-- To create the image flows -->
 
 python run_inference.py
 

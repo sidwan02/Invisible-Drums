@@ -29,7 +29,10 @@ def main(args):
     centroids_root = data_path + f"/Centroids/"
     meanshift_root = data_path + f"/Mean-Shift/"
 
+    cluster_centers_folders = []
+
     for folder in superfolder:
+        all_cluster_centers = []
         img_path1 = os.path.join(folder, "*.png")
         img_path2 = os.path.join(folder, "*.jpg")
         images = glob.glob(img_path1) + glob.glob(img_path2)
@@ -40,8 +43,8 @@ def main(args):
         centroids_dir_path = os.path.join(centroids_root, f)
         meanshift_dir_path = os.path.join(meanshift_root, f)
 
-        print(f"centroids_dir_path: {centroids_dir_path}")
-        print(f"meanshift_dir_path: {meanshift_dir_path}")
+        # print(f"centroids_dir_path: {centroids_dir_path}")
+        # print(f"meanshift_dir_path: {meanshift_dir_path}")
 
         if args.clear and os.path.exists(centroids_dir_path):
             shutil.rmtree(centroids_dir_path)
@@ -68,6 +71,23 @@ def main(args):
                 centroids_path=centroids_path[:-4] + "-meanshift.avi",
                 meanshift_path=meanshift_path[:-4] + "-centroids.png",
             )
+
+            all_cluster_centers.append(cluster_centers)
+            
+        cluster_centers_folders.append(all_cluster_centers)
+        
+    return cluster_centers_folders
+
+
+def get_centroids():
+    parser = ArgumentParser()
+
+    args = parser.parse_args()
+    args.path = "../data/custom"
+    args.clear = False
+
+    cluster_centers_folders = main(args)
+    return cluster_centers_folders
 
 
 if __name__ == "__main__":
