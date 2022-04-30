@@ -48,19 +48,18 @@ def POC():
 
 
 def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
-    grayscale_w_centroids = grayscale
+    w_centroids = cv2.cvtColor(grayscale, cv2.COLOR_GRAY2RGB)
+
     for (r, c) in cluster_centers:
         r, c = round(r), round(c)
-        grayscale_w_centroids = cv2.circle(
-            grayscale_w_centroids, (c, r), radius=3, color=(0, 0, 255), thickness=-1
+        w_centroids = cv2.circle(
+            w_centroids, (c, r), radius=3, color=(0, 0, 255), thickness=-1
         )
 
-    cv2.imwrite(
-        f"centroid_imgs/grayscale_centroids{img_name_suff}.png", grayscale_w_centroids
-    )
+    return w_centroids
 
 
-def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
+def mean_shift_custom(image, n_points=50, n_iter=5, radius=50, store_path=None):
     image = np.array(image)
     h, w = image.shape
 
@@ -84,7 +83,9 @@ def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
 
     # print(f"points: {points}")
 
-    mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-0")
+    all_frames = []
+    frame0 = mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-0")
+    all_frames.append(frame0)
 
     cur_iter = 1
 
@@ -112,23 +113,7 @@ def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
                 min_c, max_c = max(0, c - radius), min(w - 1, c + radius)
 
                 # 255 => white; # 0 => black
-                # b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
-
-                # b = 255 - np.array(
-                #     [
-                #         image[surr_r, surr_c]
-                #         for surr_r in range(min_r, max_r + 1)
-                #         for surr_c in range(min_c, max_c + 1)
-                #     ]
-                # )
-
-                x = np.array(
-                    [
-                        image[surr_r, surr_c]
-                        for surr_r in range(min_r, max_r + 1)
-                        for surr_c in range(min_c, max_c + 1)
-                    ]
-                )
+                x = np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
 
                 # b = np.e ** (-x + 4)
 
@@ -182,11 +167,23 @@ def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
                     points_radii[i] = radius_orig
                 else:
                     points_radii[i] *= 2
+            else:
+                points_radii[i] *= 2
 
             # if the sum is 0 that means all surrounding pixels are pure white 255. For now if that's the case don't update points which makes sense logically speaking
 
-        mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-{cur_iter}")
+        frame = mark_centroids(
+            copy.deepcopy(image), points, img_name_suff=f"-{cur_iter}"
+        )
+        all_frames.append(frame)
 
         cur_iter += 1
+
+    if store_path is not None:
+        out = cv2.VideoWriter(store_path, cv2.VideoWriter_fourcc(*"DIVX"), 15, (w, h))
+
+        for frame in all_frames:
+            out.write(frame)
+        out.release()
 
     return points
