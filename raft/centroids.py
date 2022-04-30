@@ -19,111 +19,6 @@ def load_image(imfile, resolution=None):
     return img
 
 
-def place_centroids(img):
-    img = np.array(img)
-
-    print(f"img.shape: {img.shape}")
-
-    grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite("grayscale.png", grayscale)
-
-    # h, w = len(grayscale), len(grayscale[0])
-
-    # intensity_weighted_pixels = []
-
-    # def intensity_to_weight(intensity):
-    #     # 255 => while; # 0 => black
-    #     return (255 - intensity) // 50
-
-    # [
-    #     intensity_weighted_pixels.append(
-    #         [[r, c]] * (intensity_to_weight(grayscale[r][c]))
-    #     )
-    #     for r in range(h)
-    #     for c in range(w)
-    # ]
-
-    # # print(f"intensity_weighted_pixels: {intensity_weighted_pixels}")
-
-    # X = np.array(list(chain(*intensity_weighted_pixels)))
-
-    # print(f"X.shape: {X.shape}")
-
-    # --> only for debugging purposes
-    # ax.scatter(X[:, 0], X[:, 1], marker=",", alpha=0.01, color="black")
-
-    # plt.show()
-
-    # # plt.savefig("saved_figure.png")
-
-    # assert 1 == 0
-    # only for debugging purposes <--
-
-    """
-    # --> Attempt MeanShift
-
-    ms = MeanShift(max_iter=0)
-    ms.fit(X)
-    cluster_centers = ms.cluster_centers_
-
-    # Attempt MeanShift <--
-    """
-
-    # """
-    # --> Attempt mean_shift_custom
-
-    cluster_centers = mean_shift_custom(grayscale)
-
-    # Attempt MeanShift <--
-    # """
-
-    """
-    # --> Attempt KMeans
-
-    clusters = MiniBatchKMeans(n_clusters=5).fit(X)
-    cluster_centers = clusters.cluster_centers_
-
-    # Attempt KMeans <--
-    # """
-
-    grayscale_w_centroids = grayscale
-    for (x, y) in cluster_centers:
-        x, y = round(x), round(y)
-        grayscale_w_centroids = cv2.circle(
-            grayscale_w_centroids, (x, y), radius=10, color=(0, 0, 255), thickness=10
-        )
-
-    cv2.imwrite("grayscale_centroids.png", grayscale_w_centroids)
-
-    """
-    # --> only for debugging purposes
-
-    fig = plt.figure()
-
-    ax = fig.add_subplot(111)
-
-    ax.set_xlim([0, w])
-    ax.set_ylim([0, h])
-
-    ax.scatter(
-        cluster_centers[:, 0],
-        cluster_centers[:, 1],
-        marker="x",
-        color="red",
-        s=300,
-        linewidth=5,
-        zorder=10,
-    )
-
-    # plt.show()
-    # only for debugging purposes <--
-    """
-
-    print(f"cluster_centers: {cluster_centers}")
-
-    assert 0 == 1
-
-
 def main(args):
     # os.system(f"python run_inference.py")
     data_path = args.path
@@ -131,7 +26,8 @@ def main(args):
     img_flo_path = data_path + "/FlowImages_gap-1"  # path to the dataset
     superfolder = glob.glob(os.path.join(img_flo_path, "*"))
 
-    outroot = data_path + f"/Centroids/"
+    centroids_root = data_path + f"/Centroids/"
+    meanshift_root = data_path + f"/Mean-Shift/"
 
     for folder in superfolder:
         img_path1 = os.path.join(folder, "*.png")
@@ -140,27 +36,38 @@ def main(args):
 
         # print(f"images: {images}")
 
-        floout = os.path.join(outroot, folder)
+        f = os.path.basename(folder)
+        centroids_dir_path = os.path.join(centroids_root, f)
+        meanshift_dir_path = os.path.join(meanshift_root, f)
 
-        if args.clear and os.path.exists(floout):
-            shutil.rmtree(floout)
-        os.makedirs(floout, exist_ok=True)
+        print(f"centroids_dir_path: {centroids_dir_path}")
+        print(f"meanshift_dir_path: {meanshift_dir_path}")
 
-        if args.clear and os.path.exists("centroid_imgs/"):
-            shutil.rmtree("centroid_imgs/")
-        os.makedirs("centroid_imgs/", exist_ok=True)
+        if args.clear and os.path.exists(centroids_dir_path):
+            shutil.rmtree(centroids_dir_path)
+        os.makedirs(centroids_dir_path, exist_ok=True)
+
+        if args.clear and os.path.exists(meanshift_dir_path):
+            shutil.rmtree(meanshift_dir_path)
+        os.makedirs(meanshift_dir_path, exist_ok=True)
 
         images_ = sorted(images)
 
         for index, imfile1 in enumerate(images_):
-            image1 = load_image(imfile1)
+            image1 = np.array(load_image(imfile1))
             svfile = imfile1
 
-            flopath = os.path.join(floout, os.path.basename(svfile))
+            centroids_path = os.path.join(centroids_dir_path, os.path.basename(svfile))
+            meanshift_path = os.path.join(meanshift_dir_path, os.path.basename(svfile))
 
-            processed_img = place_centroids(image1)
+            grayscale = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+            # cv2.imwrite("grayscale.png", grayscale)
 
-            cv2.imwrite(flopath[:-4] + ".png", processed_img)
+            cluster_centers = mean_shift_custom(
+                grayscale,
+                centroids_path=centroids_path[:-4] + "-meanshift.avi",
+                meanshift_path=meanshift_path[:-4] + "-centroids.png",
+            )
 
 
 if __name__ == "__main__":

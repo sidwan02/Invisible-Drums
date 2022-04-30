@@ -59,7 +59,9 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
     return w_centroids
 
 
-def mean_shift_custom(image, n_points=50, n_iter=5, radius=50, store_path=None):
+def mean_shift_custom(
+    image, n_points=50, n_iter=5, radius=50, centroids_path=None, meanshift_path=None
+):
     image = np.array(image)
     h, w = image.shape
 
@@ -179,11 +181,16 @@ def mean_shift_custom(image, n_points=50, n_iter=5, radius=50, store_path=None):
 
         cur_iter += 1
 
-    if store_path is not None:
-        out = cv2.VideoWriter(store_path, cv2.VideoWriter_fourcc(*"DIVX"), 15, (w, h))
+    if centroids_path is not None:
+        out = cv2.VideoWriter(
+            centroids_path, cv2.VideoWriter_fourcc(*"DIVX"), 15, (w, h)
+        )
 
         for frame in all_frames:
             out.write(frame)
         out.release()
+
+    if meanshift_path is not None:
+        cv2.imwrite(meanshift_path, all_frames[-1])
 
     return points
