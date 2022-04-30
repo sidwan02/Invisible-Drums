@@ -60,23 +60,23 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
     )
 
 
-def mean_shift_custom(image, n_points=1, n_iter=50, radius=50):
+def mean_shift_custom(image, n_points=50, n_iter=50, radius=50):
     image = np.array(image)
     h, w = image.shape
 
     # print(f"w: {w}, h: {h}")
 
-    # points = np.array(
-    #     [
-    #         (r, c)
-    #         for r, c in zip(
-    #             random.sample(range(0, h), n_points),
-    #             random.sample(range(0, w), n_points),
-    #         )
-    #     ]
-    # )
+    points = np.array(
+        [
+            (r, c)
+            for r, c in zip(
+                random.sample(range(0, h), n_points),
+                random.sample(range(0, w), n_points),
+            )
+        ]
+    )
     # points = np.array([[300, 600]])
-    points = np.array([[250, 350]])
+    # points = np.array([[250, 350]])
 
     radius_orig = radius
 
@@ -96,8 +96,8 @@ def mean_shift_custom(image, n_points=1, n_iter=50, radius=50):
             min_r, max_r = max(0, r - points_radii[i]), min(h - 1, r + points_radii[i])
             min_c, max_c = max(0, c - points_radii[i]), min(w - 1, c + points_radii[i])
 
-            print(f"surr_r: [{min_r}, {max_r}]")
-            print(f"surr_c: [{min_c}, {max_c}]")
+            # print(f"surr_r: [{min_r}, {max_r}]")
+            # print(f"surr_c: [{min_c}, {max_c}]")
 
             a = np.array(
                 [
@@ -106,40 +106,49 @@ def mean_shift_custom(image, n_points=1, n_iter=50, radius=50):
                     for surr_c in range(min_c, max_c + 1)
                 ]
             )
-            # 255 => white; # 0 => black
-            # b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
 
-            # b = 255 - np.array(
-            #     [
-            #         image[surr_r, surr_c]
-            #         for surr_r in range(min_r, max_r + 1)
-            #         for surr_c in range(min_c, max_c + 1)
-            #     ]
-            # )
+            def surrounding_avg_intensity(radius):
+                min_r, max_r = max(0, r - radius), min(h - 1, r + radius)
+                min_c, max_c = max(0, c - radius), min(w - 1, c + radius)
 
-            x = np.array(
-                [
-                    image[surr_r, surr_c]
-                    for surr_r in range(min_r, max_r + 1)
-                    for surr_c in range(min_c, max_c + 1)
-                ]
-            )
+                # 255 => white; # 0 => black
+                # b = 255 - np.array(image[min_r : max_r + 1, min_c : max_c + 1]).flatten()
 
-            # b = np.e ** (-x + 4)
+                # b = 255 - np.array(
+                #     [
+                #         image[surr_r, surr_c]
+                #         for surr_r in range(min_r, max_r + 1)
+                #         for surr_c in range(min_c, max_c + 1)
+                #     ]
+                # )
 
-            b = 255 - x
+                x = np.array(
+                    [
+                        image[surr_r, surr_c]
+                        for surr_r in range(min_r, max_r + 1)
+                        for surr_c in range(min_c, max_c + 1)
+                    ]
+                )
+
+                # b = np.e ** (-x + 4)
+
+                b = 255 - x
+
+                return b
+
+            b = surrounding_avg_intensity(points_radii[i])
 
             # print(f"a.shape: {a.shape}, b.shape: {b.shape}")
 
-            def get_radius_from_avg_intensity(avg_intensity):
-                print(f"avg_intensity: {avg_intensity}")
-                # # radius=800 if avg 0
-                # # radius=10 if avg 255
-                # m = (800 - 10) / (0 - 255)
-                # c = 800
-                # return m * avg_intensity + c
+            # def get_radius_from_avg_intensity(avg_intensity):
+            #     print(f"avg_intensity: {avg_intensity}")
+            #     # # radius=800 if avg 0
+            #     # # radius=10 if avg 255
+            #     # m = (800 - 10) / (0 - 255)
+            #     # c = 800
+            #     # return m * avg_intensity + c
 
-                return int((8000) / (avg_intensity + 10) - 10)
+            #     return int((8000) / (avg_intensity + 10) - 10)
 
             # points_radii[i] = get_radius_from_avg_intensity(np.average(b))
             # points_radii[i] = 800
@@ -150,7 +159,7 @@ def mean_shift_custom(image, n_points=1, n_iter=50, radius=50):
             # else:
             #     points_radii[i] = radius_orig
 
-            print(f"avg_intensity: {np.average(b)}")
+            # print(f"avg_intensity: {np.average(b)}")
 
             if sum(b) != 0:
                 new_points = sum(a * np.expand_dims(b, axis=1)) / sum(b)
@@ -167,8 +176,12 @@ def mean_shift_custom(image, n_points=1, n_iter=50, radius=50):
                 else:
                     points_radii[i] = radius_orig
 
-                if np.average(b) > 100:
+                local_fixed_r_intensity = np.average(surrounding_avg_intensity(20))
+
+                if local_fixed_r_intensity > 50:
                     points_radii[i] = radius_orig
+                else:
+                    points_radii[i] *= 2
 
             # if the sum is 0 that means all surrounding pixels are pure white 255. For now if that's the case don't update points which makes sense logically speaking
 

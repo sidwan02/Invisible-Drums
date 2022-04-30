@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 from itertools import chain
 from meanshift import mean_shift_custom
+import shutil
 
 
 def load_image(imfile, resolution=None):
@@ -144,6 +145,10 @@ def main(args):
         if args.clear and os.path.exists(floout):
             shutil.rmtree(floout)
         os.makedirs(floout, exist_ok=True)
+
+        if args.clear and os.path.exists("centroid_imgs/"):
+            shutil.rmtree("centroid_imgs/")
+        os.makedirs("centroid_imgs/", exist_ok=True)
 
         images_ = sorted(images)
 
