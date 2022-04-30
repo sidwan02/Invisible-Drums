@@ -193,4 +193,4 @@ def mean_shift_custom(
     if meanshift_path is not None:
         cv2.imwrite(meanshift_path, all_frames[-1])
 
-    return points
+    return [[r, c, image[r, c]] for (r, c) in points]
