@@ -23,6 +23,8 @@ def main(args):
     # os.system(f"python run_inference.py")
     data_path = args.path
 
+    print(f"data_path: {data_path}")
+
     img_flo_path = data_path + "/FlowImages_gap-1"  # path to the dataset
     superfolder = glob.glob(os.path.join(img_flo_path, "*"))
 
@@ -30,6 +32,8 @@ def main(args):
     meanshift_root = data_path + f"/Mean-Shift/"
 
     cluster_centers_folders = []
+
+    print(f"superfolder: {superfolder}")
 
     for folder in superfolder:
         all_cluster_centers = []
@@ -73,9 +77,9 @@ def main(args):
             )
 
             all_cluster_centers.append(cluster_centers)
-            
+
         cluster_centers_folders.append(all_cluster_centers)
-        
+
     return cluster_centers_folders
 
 
@@ -83,8 +87,10 @@ def get_centroids():
     parser = ArgumentParser()
 
     args = parser.parse_args()
-    args.path = "../data/custom"
-    args.clear = False
+    args.path = "./data/custom"  # no .. since this is being called from run.py which is at the root of the repo
+    args.clear = True
+
+    print(f"in get_centroids")
 
     cluster_centers_folders = main(args)
     return cluster_centers_folders
