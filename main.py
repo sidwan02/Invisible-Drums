@@ -2,13 +2,14 @@ import numpy as np
 from aggregator import aggregate_centroids, get_confidence_score
 
 
-def run_single_iteration(r, c, intensity):
+def run_single_iteration(cluster_centroids):
     '''
     runs our system for a single iteration
+
     Args:
-        r: ?????
-        c: ?????
-        intensity:  ?????
+        clusters: list of (row, col, intensity) tuples, one for each of the k cluster centroids
+    Returns
+        Nothing
     '''
     # step 3: get blobs (aggregated clusters) and calculate the movement confidence score for this frame
     blob_locs, blob_intensities = aggregate_centroids(curr_frame_centroids, curr_frame)
@@ -37,7 +38,7 @@ def run_single_iteration(r, c, intensity):
         play_sound(sound_id)
 
         # (step 7): if we have a rebound, prevent a rebound in the next 5-10 frames?
-
+        
 
 if __name__ == "__main__":
     # set parameters
@@ -50,11 +51,10 @@ if __name__ == "__main__":
 
     for folder in all_centroid_data:
         for video in folder:
-            for frame in video:
-                #TODO: pls rename or document r, c, intensity
-                for r, c, intensity in frame:
-                    # keep track of previous state
-                    n_prev_scores = [] # scalar list
-                    m_prev_scores = [] # scalar list
-                    prev_potential_rebounds = [] # boolean list
-                    run_single_iteration(r, c, intensity)
+            for frame_clusters in video:
+                # frame_clusters = [(r,c,intensity), ...]
+                # keep track of previous state
+                n_prev_scores = [] # scalar list
+                m_prev_scores = [] # scalar list
+                prev_potential_rebounds = [] # boolean list
+                run_single_iteration(frame_clusters) 
