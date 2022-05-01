@@ -11,8 +11,13 @@ def run_single_iteration(cluster_centroids):
     Returns
         Nothing
     """
+    # convert to np arrays and unpack
+    cluster_centroids = np.array(cluster_centroids) # list of (r,c,intensity)
+    centroid_locations = cluster_centroids[:, :2] # first two coordinates are (r,c)
+    centroid_intensities = cluster_centroids[:, 2] # last coordinate is intensity
+
     # step 3: get blobs (aggregated clusters) and calculate the movement confidence score for this frame
-    blob_locs, blob_intensities = aggregate_centroids(curr_frame_centroids, curr_frame)
+    blob_locs, blob_intensities = aggregate_centroids(centroid_locations, centroid_intensities)
     confidence_score = get_confidence_score()  # scalar
 
     # update state of prev scores
