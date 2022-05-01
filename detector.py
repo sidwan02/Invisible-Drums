@@ -41,7 +41,19 @@ def detect_rebound(previous_scores, previous_rebounds, locations, intensities, t
 
 
 
+"""
+function that helps in detect of a rebound took place. 
 
+INPUTS:
+* n_scores = list of past n scores (or a smaller list if we’ve not seen n frames yet)
+* pix_loc = list of pixel locations of all blob centroids for the current frame
+* intensities = list of pixel locations of all blob centroids for the current frame
+* threshold = threshold is the value which the current score must be under
+
+OUTPUTS: 
+* boolean for whether the current score suggests a potential incoming rebound for the current frame
+* (x,y) pixel location of most intense centroid 
+"""
 def detect_rebound(n_scores, pix_loc, intensities, threshold):
     current_score = get_confidence_score(pix_loc, intensities)
     highest_intensity_loc = pix_loc[np.argmax(intensities)]
