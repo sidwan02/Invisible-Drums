@@ -30,17 +30,16 @@ def main(args):
 
     centroids_root = data_path + f"/Centroids/"
     meanshift_root = data_path + f"/Mean-Shift/"
+    blobs_root = data_path + f"/Blobs/"
 
-    # [[[[...], [...]]]]
-
-    cluster_centers_folders = []
-    flow_grayscale_folders = []
+    # cluster_centers_folders = []
+    # flow_grayscale_folders = []
 
     print(f"superfolder: {superfolder}")
 
     for folder in superfolder:
-        all_cluster_centers = []
-        all_flow_grayscale = []
+        # all_cluster_centers = []
+        # all_flow_grayscale = []
         img_path1 = os.path.join(folder, "*.png")
         img_path2 = os.path.join(folder, "*.jpg")
         images = glob.glob(img_path1) + glob.glob(img_path2)
@@ -50,6 +49,7 @@ def main(args):
         f = os.path.basename(folder)
         centroids_dir_path = os.path.join(centroids_root, f)
         meanshift_dir_path = os.path.join(meanshift_root, f)
+        blobs_dir_path = os.path.join(blobs_root, f)
 
         # print(f"centroids_dir_path: {centroids_dir_path}")
         # print(f"meanshift_dir_path: {meanshift_dir_path}")
@@ -62,6 +62,10 @@ def main(args):
             shutil.rmtree(meanshift_dir_path)
         os.makedirs(meanshift_dir_path, exist_ok=True)
 
+        if args.clear and os.path.exists(blobs_dir_path):
+            shutil.rmtree(blobs_dir_path)
+        os.makedirs(blobs_dir_path, exist_ok=True)
+
         images_ = sorted(images)
 
         for index, imfile1 in enumerate(images_):
@@ -70,10 +74,11 @@ def main(args):
 
             centroids_path = os.path.join(centroids_dir_path, os.path.basename(svfile))
             meanshift_path = os.path.join(meanshift_dir_path, os.path.basename(svfile))
+            blobs_path = os.path.join(blobs_dir_path, os.path.basename(svfile))
 
             grayscale = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
             # cv2.imwrite("grayscale.png", grayscale)
-            all_flow_grayscale.append(grayscale)
+            # all_flow_grayscale.append(grayscale)
 
             cluster_centers = mean_shift_custom(
                 grayscale,
@@ -81,10 +86,14 @@ def main(args):
                 meanshift_path=meanshift_path[:-4] + "-centroids.png",
             )
 
-            all_cluster_centers.append(cluster_centers)
+            run_single_iteration(
+                cluster_centers, grayscale, blobs_path=blobs_path[:-4] + "-blobs.png"
+            )
 
-        cluster_centers_folders.append(all_cluster_centers)
-        flow_grayscale_folders.append(all_flow_grayscale)
+            # all_cluster_centers.append(cluster_centers)
+
+        # cluster_centers_folders.append(all_cluster_centers)
+        # flow_grayscale_folders.append(all_flow_grayscale)
 
     np.save(data_path + "/all_cluster_centers.npy", cluster_centers_folders)
     np.save(data_path + "/all_flow_grayscale.npy", flow_grayscale_folders)

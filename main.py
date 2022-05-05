@@ -4,7 +4,7 @@ from detector import *
 from argparse import ArgumentParser
 
 
-def run_single_iteration(cluster_centroids, frame_flows, iter_num):
+def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     """
     runs our system for a single iteration
 
@@ -31,11 +31,12 @@ def run_single_iteration(cluster_centroids, frame_flows, iter_num):
         blob_locs, blob_intensities, total_num_clusters=50
     )  # returns scalar
 
-    blobs_on_flow = mark_centroids(
-        copy.deepcopy(frame_flows), centroid_locations, img_name_suff=f"-{iter_num}"
-    )
+    if blobs_path is not None:
+        blobs_on_flow = mark_centroids(
+            copy.deepcopy(frame_flow), centroid_locations, img_name_suff=f"-{iter_num}"
+        )
 
-    cv2.imwrite(meanshift_path, blobs_on_flow)
+        cv2.imwrite(blobs_path, blobs_on_flow)
 
     print(f"blob_locs: {blob_locs}")
     # print(f"blob_intensities: {blob_intensities}")
@@ -144,6 +145,6 @@ if __name__ == "__main__":
         m_prev_scores = []  # scalar list
         prev_potential_rebounds = []  # boolean list
         # get clusters for each RAFT frame for the current video
-        for iter_num, (frame_clusters, frame_flows) in enumerate(zip(video, flows)):
+        for iter_num, (frame_clusters, frame_flow) in enumerate(zip(video, flows)):
             # frame_clusters is of type [[r,c,intensity], ...]
-            run_single_iteration(frame_clusters, frame_flows, iter_num)
+            run_single_iteration(frame_clusters, frame_flow, iter_num)
