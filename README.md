@@ -25,4 +25,7 @@ Example:
 
 ## Get Maximal Intensity Centroids
 
-`python run.py`
+```
+cd raft/
+python centroids.py --clear
+```

@@ -80,6 +80,7 @@ def main(args):
 
         cluster_centers_folders.append(all_cluster_centers)
 
+    np.save(data_path + "/all_cluster_centers.npy", cluster_centers_folders)
     return cluster_centers_folders
 
 
