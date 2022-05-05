@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 from itertools import chain
 from meanshift import mean_shift_custom
+from main import run_single_iteration
 import shutil
 
 
@@ -95,8 +96,8 @@ def main(args):
         # cluster_centers_folders.append(all_cluster_centers)
         # flow_grayscale_folders.append(all_flow_grayscale)
 
-    np.save(data_path + "/all_cluster_centers.npy", cluster_centers_folders)
-    np.save(data_path + "/all_flow_grayscale.npy", flow_grayscale_folders)
+    # np.save(data_path + "/all_cluster_centers.npy", cluster_centers_folders)
+    # np.save(data_path + "/all_flow_grayscale.npy", flow_grayscale_folders)
     # print(cluster_centers_folders)
     return cluster_centers_folders
 
@@ -117,7 +118,7 @@ def get_centroids():
 if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument("--path", type=str, default="../data/custom")
+    parser.add_argument("--path", type=str, default="./data/custom")
     parser.add_argument("--clear", action=BooleanOptionalAction)
 
     args = parser.parse_args()

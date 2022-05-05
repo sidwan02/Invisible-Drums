@@ -47,6 +47,9 @@ def POC():
     # plt.show()
 
 
+POC()
+
+
 def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
     w_centroids = cv2.cvtColor(grayscale, cv2.COLOR_GRAY2RGB)
 

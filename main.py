@@ -2,6 +2,24 @@ import numpy as np
 from aggregator import aggregate_centroids, get_confidence_score
 from detector import *
 from argparse import ArgumentParser
+from meanshift import mark_centroids
+import copy
+import cv2
+
+
+def mark_blobs(grayscale, blob_centers, blob_intensities):
+    orig = cv2.cvtColor(grayscale, cv2.COLOR_GRAY2RGB)
+    overlay = orig.copy()
+
+    for i, (r, c) in enumerate(blob_centers):
+        r, c = round(r), round(c)
+        alpha = len(blob_intensities[i]) / 50
+        overlay = cv2.circle(
+            overlay, (c, r), radius=30, color=(0, 0, 255), thickness=-1
+        )
+        orig = cv2.addWeighted(overlay, alpha, orig, 1 - alpha, 0, orig)
+
+    return orig
 
 
 def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
@@ -14,7 +32,7 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     Returns
         Nothing
     """
-    print("== VIDEO ", iter_num, " ==")
+    # print("== VIDEO ", iter_num, " ==")
 
     # print(f"cluster_centroids: {cluster_centroids}")
 
@@ -32,8 +50,9 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     )  # returns scalar
 
     if blobs_path is not None:
-        blobs_on_flow = mark_centroids(
-            copy.deepcopy(frame_flow), centroid_locations, img_name_suff=f"-{iter_num}"
+        # blobs_on_flow = mark_centroids(copy.deepcopy(frame_flow), blob_locs)
+        blobs_on_flow = mark_blobs(
+            copy.deepcopy(frame_flow), blob_locs, blob_intensities
         )
 
         cv2.imwrite(blobs_path, blobs_on_flow)
