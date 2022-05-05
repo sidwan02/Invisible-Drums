@@ -33,13 +33,13 @@ def main(args):
     meanshift_root = data_path + f"/Mean-Shift/"
     blobs_root = data_path + f"/Blobs/"
 
-    # cluster_centers_folders = []
+    blobs_data_folders = []
     # flow_grayscale_folders = []
 
     print(f"superfolder: {superfolder}")
 
     for folder in superfolder:
-        # all_cluster_centers = []
+        all_blobs_data = []
         # all_flow_grayscale = []
         img_path1 = os.path.join(folder, "*.png")
         img_path2 = os.path.join(folder, "*.jpg")
@@ -87,32 +87,32 @@ def main(args):
                 meanshift_path=meanshift_path[:-4] + "-centroids.png",
             )
 
-            run_single_iteration(
+            blobs_data = run_single_iteration(
                 cluster_centers, grayscale, blobs_path=blobs_path[:-4] + "-blobs.png"
             )
 
-            # all_cluster_centers.append(cluster_centers)
+            all_blobs_data.append(blobs_data)
 
-        # cluster_centers_folders.append(all_cluster_centers)
+        blobs_data_folders.append(all_blobs_data)
         # flow_grayscale_folders.append(all_flow_grayscale)
 
-    # np.save(data_path + "/all_cluster_centers.npy", cluster_centers_folders)
+    np.save(data_path + "/all_blobs_data.npy", blobs_data_folders)
     # np.save(data_path + "/all_flow_grayscale.npy", flow_grayscale_folders)
     # print(cluster_centers_folders)
-    return cluster_centers_folders
+    # return cluster_centers_folders
 
 
-def get_centroids():
-    parser = ArgumentParser()
+# def get_centroids():
+#     parser = ArgumentParser()
 
-    args = parser.parse_args()
-    args.path = "./data/custom"  # no .. since this is being called from run.py which is at the root of the repo
-    args.clear = True
+#     args = parser.parse_args()
+#     args.path = "./data/custom"  # no .. since this is being called from run.py which is at the root of the repo
+#     args.clear = True
 
-    print(f"in get_centroids")
+#     print(f"in get_centroids")
 
-    cluster_centers_folders = main(args)
-    return cluster_centers_folders
+#     cluster_centers_folders = main(args)
+#     return cluster_centers_folders
 
 
 if __name__ == "__main__":

@@ -47,7 +47,7 @@ def POC():
     # plt.show()
 
 
-POC()
+# POC()
 
 
 def mark_centroids(grayscale, cluster_centers, img_name_suff=""):

@@ -23,17 +23,6 @@ def mark_blobs(grayscale, blob_centers, blob_intensities):
 
 
 def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
-    """
-    runs our system for a single iteration
-
-    Args:
-        clusters: list of (row, col, intensity) tuples, one for each of the k cluster centroids
-        iter_num: current iteration number (zero-indexed) for a video 
-    Returns
-        Nothing
-    """
-    # print("== VIDEO ", iter_num, " ==")
-
     # print(f"cluster_centroids: {cluster_centroids}")
 
     # convert to np arrays and unpack
@@ -58,8 +47,33 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
         cv2.imwrite(blobs_path, blobs_on_flow)
 
     print(f"blob_locs: {blob_locs}")
-    # print(f"blob_intensities: {blob_intensities}")
+    print(f"blob_intensities: {blob_intensities}")
     print(f"curr_confidence_score: {curr_confidence_score}")
+
+    return {
+        "blob_locs": blob_locs,
+        "blob_intensities": blob_intensities,
+        "curr_confidence_score": curr_confidence_score,
+    }
+
+
+def thing(frame_blob_data, iter_num):
+    """
+    runs our system for a single iteration
+
+    Args:
+        clusters: list of (row, col, intensity) tuples, one for each of the k cluster centroids
+        iter_num: current iteration number (zero-indexed) for a video 
+    Returns
+        Nothing
+    """
+    print("== VIDEO ", iter_num, " ==")
+
+    blob_locs, blob_intensities, curr_confidence_score, = (
+        frame_blob_data["blob_locs"],
+        frame_blob_data["blob_intensities"],
+        frame_blob_data["curr_confidence_score"],
+    )
 
     # update state of prev scores
     n_prev_scores.append(curr_confidence_score)
@@ -111,11 +125,13 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
 
         # (step 7): if we have a rebound, prevent a rebound in the next 5-10 frames?
 
+    return
+
 
 import sys
 
 sys.path.append("raft/")
-from centroids import get_centroids
+# from centroids import get_centroids
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -139,12 +155,14 @@ if __name__ == "__main__":
     # See README.md: Get Maximal Intensity Centroids
 
     # all_centroid_data = get_centroids()
-    all_centroid_data = np.load(args.path + "all_cluster_centers.npy")
-    all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
+    all_blobs_data = np.load(args.path + "all_blobs_data.npy", allow_pickle=True)
+    # all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
+
+    print(f"all_blobs_data: ", all_blobs_data)
 
     # dim 1 -> folder/video
     # dim 2 -> frame
-    # dim 3 -> [r, c, intensity]
+    # dim 3 -> {dict of three keys and values}
 
     # Note: x = c, y = r
 
@@ -153,7 +171,7 @@ if __name__ == "__main__":
     # 255 => highest velocity
 
     # each folder represents a video
-    for video, flows in zip(all_centroid_data, all_flow_grayscale):
+    for video in all_blobs_data:
         # TODO: set img size of this video (for get_drum_id())
         c, r = (856, 480)
         img_size_x = c
@@ -164,6 +182,6 @@ if __name__ == "__main__":
         m_prev_scores = []  # scalar list
         prev_potential_rebounds = []  # boolean list
         # get clusters for each RAFT frame for the current video
-        for iter_num, (frame_clusters, frame_flow) in enumerate(zip(video, flows)):
+        for iter_num, frame_blob_data in enumerate(video):
             # frame_clusters is of type [[r,c,intensity], ...]
-            run_single_iteration(frame_clusters, frame_flow, iter_num)
+            thing(frame_blob_data, iter_num)
