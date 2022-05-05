@@ -4,7 +4,7 @@ from detector import *
 from argparse import ArgumentParser
 
 
-def run_single_iteration(cluster_centroids, iter_num):
+def run_single_iteration(cluster_centroids, frame_flows, iter_num):
     """
     runs our system for a single iteration
 
@@ -14,7 +14,9 @@ def run_single_iteration(cluster_centroids, iter_num):
     Returns
         Nothing
     """
-    print("== ITERATION ", iter_num, " ==")
+    print("== VIDEO ", iter_num, " ==")
+
+    # print(f"cluster_centroids: {cluster_centroids}")
 
     # convert to np arrays and unpack
     cluster_centroids = np.array(cluster_centroids)  # list of (r,c,intensity)
@@ -28,6 +30,16 @@ def run_single_iteration(cluster_centroids, iter_num):
     curr_confidence_score = get_confidence_score(
         blob_locs, blob_intensities, total_num_clusters=50
     )  # returns scalar
+
+    blobs_on_flow = mark_centroids(
+        copy.deepcopy(frame_flows), centroid_locations, img_name_suff=f"-{iter_num}"
+    )
+
+    cv2.imwrite(meanshift_path, blobs_on_flow)
+
+    print(f"blob_locs: {blob_locs}")
+    # print(f"blob_intensities: {blob_intensities}")
+    print(f"curr_confidence_score: {curr_confidence_score}")
 
     # update state of prev scores
     n_prev_scores.append(curr_confidence_score)
@@ -88,18 +100,17 @@ from centroids import get_centroids
 if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument(
-        "--path_to_npy", type=str, default="./data/custom/all_cluster_centers.npy"
-    )
+    parser.add_argument("--path", type=str, default="./data/custom/")
     # set parameters
-    # n = 3
     parser.add_argument("--n", type=int, default=3)
-    # m = 3
     parser.add_argument("--m", type=int, default=3)
-    # T = 50
     parser.add_argument("--T", type=int, default=50)
 
     args = parser.parse_args()
+
+    n = args.n
+    m = args.m
+    T = args.T
 
     # step 1: generate image flows from RAFT
     # See README.md: Generate Image Flows
@@ -108,13 +119,12 @@ if __name__ == "__main__":
     # See README.md: Get Maximal Intensity Centroids
 
     # all_centroid_data = get_centroids()
-    all_centroid_data = np.load(args.path_to_npy)
+    all_centroid_data = np.load(args.path + "all_cluster_centers.npy")
+    all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
 
-    # print(f"all_centroid_data: {all_centroid_data}")
-    # dim 1 -> folder
-    # dim 2 -> video
-    # dim 3 -> frame
-    # dim 4 -> [r, c, intensity]
+    # dim 1 -> folder/video
+    # dim 2 -> frame
+    # dim 3 -> [r, c, intensity]
 
     # Note: x = c, y = r
 
@@ -122,18 +132,18 @@ if __name__ == "__main__":
     # 0 => 0 velocity
     # 255 => highest velocity
 
-    for folder in all_centroid_data:
-        for video in folder:
-            # TODO: set img size of this video (for get_drum_id())
-            c, r = (856, 480)
-            img_size_x = c
-            img_size_y = r
+    # each folder represents a video
+    for video, flows in zip(all_centroid_data, all_flow_grayscale):
+        # TODO: set img size of this video (for get_drum_id())
+        c, r = (856, 480)
+        img_size_x = c
+        img_size_y = r
 
-            # keep track of state across frames (modified in run_single_iteration)
-            n_prev_scores = []  # scalar list
-            m_prev_scores = []  # scalar list
-            prev_potential_rebounds = []  # boolean list
-            # get clusters for each RAFT frame for the current video
-            for iter_num, frame_clusters in enumerate(video):
-                # frame_clusters is of type [(r,c,intensity), ...]
-                run_single_iteration(frame_clusters, iter_num)
+        # keep track of state across frames (modified in run_single_iteration)
+        n_prev_scores = []  # scalar list
+        m_prev_scores = []  # scalar list
+        prev_potential_rebounds = []  # boolean list
+        # get clusters for each RAFT frame for the current video
+        for iter_num, (frame_clusters, frame_flows) in enumerate(zip(video, flows)):
+            # frame_clusters is of type [[r,c,intensity], ...]
+            run_single_iteration(frame_clusters, frame_flows, iter_num)

@@ -31,12 +31,16 @@ def main(args):
     centroids_root = data_path + f"/Centroids/"
     meanshift_root = data_path + f"/Mean-Shift/"
 
+    # [[[[...], [...]]]]
+
     cluster_centers_folders = []
+    flow_grayscale_folders = []
 
     print(f"superfolder: {superfolder}")
 
     for folder in superfolder:
         all_cluster_centers = []
+        all_flow_grayscale = []
         img_path1 = os.path.join(folder, "*.png")
         img_path2 = os.path.join(folder, "*.jpg")
         images = glob.glob(img_path1) + glob.glob(img_path2)
@@ -69,6 +73,7 @@ def main(args):
 
             grayscale = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
             # cv2.imwrite("grayscale.png", grayscale)
+            all_flow_grayscale.append(grayscale)
 
             cluster_centers = mean_shift_custom(
                 grayscale,
@@ -79,8 +84,11 @@ def main(args):
             all_cluster_centers.append(cluster_centers)
 
         cluster_centers_folders.append(all_cluster_centers)
+        flow_grayscale_folders.append(all_flow_grayscale)
 
     np.save(data_path + "/all_cluster_centers.npy", cluster_centers_folders)
+    np.save(data_path + "/all_flow_grayscale.npy", flow_grayscale_folders)
+    # print(cluster_centers_folders)
     return cluster_centers_folders
 
 
