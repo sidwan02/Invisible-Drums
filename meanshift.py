@@ -65,11 +65,11 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
 def mean_shift_custom(
     image,
     n_points=50,
-    n_iter=40,
-    min_radius=20,
+    n_iter=30,
+    min_radius=50,
     centroids_path=None,
     meanshift_path=None,
-    max_radius=500,
+    max_radius=800,
 ):
     image = np.array(image)
     h, w = image.shape
@@ -90,7 +90,11 @@ def mean_shift_custom(
 
     radius_orig = min_radius
 
-    points_radii = [max_radius] * n_points
+    points_radii = [radius_orig] * n_points
+
+    flags = [True] * n_points
+
+    shifts = [float("inf")] * n_points
 
     # print(f"points: {points}")
 
@@ -135,6 +139,13 @@ def mean_shift_custom(
 
             b = surrounding_avg_intensity(points_radii[i])
 
+            b[b > 200] *= 2
+            b[b > 150] *= 2
+            # b[b > 100] *= 2
+            # b[b > 50] *= 2
+
+            # this is to weight the more intense regions more
+
             # print(f"a.shape: {a.shape}, b.shape: {b.shape}")
 
             # def get_radius_from_avg_intensity(avg_intensity):
@@ -168,39 +179,71 @@ def mean_shift_custom(
                 )
                 points[i] = new_points
 
-                if (
-                    # shift < 20 and points_radii[i] > 150
-                    False
-                ):  # this means it's in a local minimum surrounded by largely white
-                    points_radii[i] *= 2
+                local_fixed_r_intensity = np.average(
+                    surrounding_avg_intensity(min_radius)
+                )
+
+                shifts[i] = shift
+
+                # if shift < 2 or local_fixed_r_intensity < 30:
+                # if local_fixed_r_intensity < 30:
+                #     points_radii[i] += 20
+                # if shift < 20:
+                #     points_radii[i] += 20
+                # else:
+                #     # no change to radius
+                #     continue
+                # if local_fixed_r_intensity < 30:
+                #     points_radii[i] += 20
+                # elif local_fixed_r_intensity < 100:
+                #     points_radii[i] -= 5
+                #     # points_radii[i] = 300
+                # elif local_fixed_r_intensity < 150:
+                #     points_radii[i] -= 10
+                #     # points_radii[i] = 150
+                # elif local_fixed_r_intensity < 200:
+                #     # points_radii[i] = 100
+                #     points_radii[i] -= 20
+                # else:
+                #     # points_radii[i] = 50
+                #     points_radii[i] -= 30
+                if local_fixed_r_intensity < 30:
+                    points_radii[i] += 20
                 else:
+                    points_radii[i] -= 20
 
-                    local_fixed_r_intensity = np.average(
-                        surrounding_avg_intensity(min_radius)
-                    )
+                points_radii[i] = max(points_radii[i], min_radius)
+                # # if local_fixed_r_intensity < 50 and flags[i]:
+                # if shift < 50 and local_fixed_r_intensity < 50 and flags[i]:
+                #     points_radii[i] += 50
+                #     # this means it's in a local minimum surrounded by largely white
+                # else:
+                #     flags[i] = False
 
-                    def func(x):
-                        m = (max_radius - min_radius) / (0 - 255)
-                        y = m * x + max_radius
-                        return int(y)
+                #     def func(x):
+                #         m = (max_radius - min_radius) / (0 - 255)
+                #         y = m * x + max_radius
+                #         return int(y)
 
-                    def func2(x):
-                        y = 1 / (((x - 60) / 48) ** (-5)) + 50
-                        return int(y)
+                #     def func2(x):
+                #         # y = 1 / (((x - 60) / 48) ** (-5)) + 50
+                #         y = 1 / (((x - 10 + 1e-9) / 40) ** (-5)) + 50
+                #         return int(y)
 
-                    def func3(x):
-                        y = 1 / (np.e ** -((x - 20) / 26)) + 50
-                        return int(y)
+                #     def func3(x):
+                #         # y = 1 / (np.e ** -((x - 20) / 26)) + 50
+                #         y = 1 / (np.e ** -((x - 10) / 26)) + 70
+                #         return int(y)
 
-                    # points_radii[i] = func(local_fixed_r_intensity)
-                    points_radii[i] = min(max_radius, func3(local_fixed_r_intensity))
+                #     # points_radii[i] = func(local_fixed_r_intensity)
+                #     points_radii[i] = min(max_radius, func2(local_fixed_r_intensity))
 
-                    # if local_fixed_r_intensity > 150:
-                    #     points_radii[i] = radius_orig
-                    # else:
-                    #     points_radii[i] *= 2
+                #     # if local_fixed_r_intensity > 150:
+                #     #     points_radii[i] = radius_orig
+                #     # else:
+                #     #     points_radii[i] *= 2
             else:
-                points_radii[i] *= 2
+                points_radii[i] += 20
 
             # if the sum is 0 that means all surrounding pixels are pure white 255. For now if that's the case don't update points which makes sense logically speaking
 
@@ -210,6 +253,9 @@ def mean_shift_custom(
         all_frames.append(frame)
 
         cur_iter += 1
+
+        # if np.average(shifts) < 10:
+        #     break
 
     if centroids_path is not None:
         out = cv2.VideoWriter(
