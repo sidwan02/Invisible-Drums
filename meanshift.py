@@ -63,7 +63,13 @@ def mark_centroids(grayscale, cluster_centers, img_name_suff=""):
 
 
 def mean_shift_custom(
-    image, n_points=50, n_iter=50, radius=50, centroids_path=None, meanshift_path=None
+    image,
+    n_points=50,
+    n_iter=40,
+    min_radius=20,
+    centroids_path=None,
+    meanshift_path=None,
+    max_radius=500,
 ):
     image = np.array(image)
     h, w = image.shape
@@ -82,20 +88,21 @@ def mean_shift_custom(
     # points = np.array([[300, 600]])
     # points = np.array([[250, 350]])
 
-    radius_orig = radius
+    radius_orig = min_radius
 
-    points_radii = [radius_orig] * n_points
+    points_radii = [max_radius] * n_points
 
     # print(f"points: {points}")
 
     all_frames = []
-    frame0 = mark_centroids(copy.deepcopy(image), points, img_name_suff=f"-0")
+    frame0 = mark_centroids(copy.deepcopy(image), points)
     all_frames.append(frame0)
 
     cur_iter = 1
 
     while cur_iter <= n_iter:
-        print(f"cur_iter: {cur_iter}")
+        print(f"cur_iter: {cur_iter}; avg radius: {np.average(points_radii)}")
+
         for i, (r, c) in enumerate(points):
             r, c = round(r), round(c)
 
@@ -161,17 +168,37 @@ def mean_shift_custom(
                 )
                 points[i] = new_points
 
-                if shift < 5:
+                if (
+                    # shift < 20 and points_radii[i] > 150
+                    False
+                ):  # this means it's in a local minimum surrounded by largely white
                     points_radii[i] *= 2
                 else:
-                    points_radii[i] = radius_orig
 
-                local_fixed_r_intensity = np.average(surrounding_avg_intensity(20))
+                    local_fixed_r_intensity = np.average(
+                        surrounding_avg_intensity(min_radius)
+                    )
 
-                if local_fixed_r_intensity > 50:
-                    points_radii[i] = radius_orig
-                else:
-                    points_radii[i] *= 2
+                    def func(x):
+                        m = (max_radius - min_radius) / (0 - 255)
+                        y = m * x + max_radius
+                        return int(y)
+
+                    def func2(x):
+                        y = 1 / (((x - 60) / 48) ** (-5)) + 50
+                        return int(y)
+
+                    def func3(x):
+                        y = 1 / (np.e ** -((x - 20) / 26)) + 50
+                        return int(y)
+
+                    # points_radii[i] = func(local_fixed_r_intensity)
+                    points_radii[i] = min(max_radius, func3(local_fixed_r_intensity))
+
+                    # if local_fixed_r_intensity > 150:
+                    #     points_radii[i] = radius_orig
+                    # else:
+                    #     points_radii[i] *= 2
             else:
                 points_radii[i] *= 2
 

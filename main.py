@@ -57,7 +57,7 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     }
 
 
-def thing(frame_blob_data, iter_num):
+def rebound_detection(frame_blob_data, iter_num):
     """
     runs our system for a single iteration
 
@@ -74,6 +74,8 @@ def thing(frame_blob_data, iter_num):
         frame_blob_data["blob_intensities"],
         frame_blob_data["curr_confidence_score"],
     )
+
+    print(f"blob_intensities: {blob_intensities}")
 
     # update state of prev scores
     n_prev_scores.append(curr_confidence_score)
@@ -116,6 +118,9 @@ def thing(frame_blob_data, iter_num):
         blob_intensities,
         threshold=T,
     )
+
+    print(f"rebound_location: {rebound_location}")
+
     if rebound_location is not None:
         # step 6: get sound effect ID based on rebound location and play the sound
         drum_sound_id = get_drum_id(img_size_x, img_size_y, rebound_location)
@@ -158,7 +163,7 @@ if __name__ == "__main__":
     all_blobs_data = np.load(args.path + "all_blobs_data.npy", allow_pickle=True)
     # all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
 
-    print(f"all_blobs_data: ", all_blobs_data)
+    # print(f"all_blobs_data: ", all_blobs_data)
 
     # dim 1 -> folder/video
     # dim 2 -> frame
@@ -184,4 +189,4 @@ if __name__ == "__main__":
         # get clusters for each RAFT frame for the current video
         for iter_num, frame_blob_data in enumerate(video):
             # frame_clusters is of type [[r,c,intensity], ...]
-            thing(frame_blob_data, iter_num)
+            rebound_detection(frame_blob_data, iter_num)
