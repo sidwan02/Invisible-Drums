@@ -85,8 +85,9 @@ def mean_shift_custom(
             )
         ]
     )
-    # points = np.array([[300, 600]])
+    # points = np.array([[150, 350]])
     # points = np.array([[250, 350]])
+    # points = np.array([[350, 350]])
 
     radius_orig = min_radius
 
@@ -137,12 +138,13 @@ def mean_shift_custom(
 
                 return b
 
-            b = surrounding_avg_intensity(points_radii[i])
+            b = surrounding_avg_intensity(points_radii[i]).astype("float64")
 
-            b[b > 200] *= 2
-            b[b > 150] *= 2
-            # b[b > 100] *= 2
-            # b[b > 50] *= 2
+            b[b > 200] *= 10
+            b[b > 150] *= 10
+            b[b > 100] *= 10
+            b[b > 50] *= 10
+            # b[b < 100] *= 0.1
 
             # this is to weight the more intense regions more
 
@@ -208,9 +210,10 @@ def mean_shift_custom(
                 #     # points_radii[i] = 50
                 #     points_radii[i] -= 30
                 if local_fixed_r_intensity < 30:
-                    points_radii[i] += 20
+                    points_radii[i] += 10
                 else:
-                    points_radii[i] -= 20
+                    points_radii[i] = 50
+                # points_radii[i] = 100
 
                 points_radii[i] = max(points_radii[i], min_radius)
                 # # if local_fixed_r_intensity < 50 and flags[i]:
