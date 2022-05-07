@@ -17,13 +17,18 @@ def save_video_frames(args):
     video = cv2.VideoCapture(args.video_path)
     # read in first frame
     read_success, image = video.read()
+
+    frames_written = 0
+
     frame_count = 0
     while read_success:
-        # save curr frame as jpg (e.g. 0.jpg, 1.jpg, etc)
-        cv2.imwrite("{}/{}.jpg".format(args.new_dir_name, frame_count), image)
-        # read new frame
+        if frame_count % args.skip == 0:
+            # save curr frame as jpg (e.g. 0.jpg, 1.jpg, etc)
+            cv2.imwrite("{}/{}.jpg".format(args.new_dir_name, frames_written), image)
+            # read new frame
+            print(f"Read frame {frame_count}")
+            frames_written += 1
         read_success, image = video.read()
-        print("Read a new frame: ", read_success)
         frame_count += 1
 
 
@@ -33,6 +38,9 @@ if __name__ == "__main__":
     parser.add_argument("--video_path", type=str, default="./Videos/Anish-Slow.mp4")
     parser.add_argument(
         "--new_dir_name", type=str, default="./data/custom/JPEGImages/Anish-Slow/"
+    )
+    parser.add_argument(
+        "--skip", type=int, default=5
     )
     parser.add_argument("--clear", action=BooleanOptionalAction)
 

@@ -6,8 +6,12 @@ from argparse import ArgumentParser, BooleanOptionalAction
 def run_inference(args):
     data_path = args.path
     # data_path = "../data/DAVIS2016"
-    gap = [1, 2]
-    reverse = [0, 1]
+    # gap = [1, 2]
+    # reverse = [0, 1]
+
+    gap = [1]
+    reverse = [0]
+
     rgbpath = data_path + "/JPEGImages"  # path to the dataset
     folder = gb.glob(os.path.join(rgbpath, "*"))
 
@@ -17,7 +21,11 @@ def run_inference(args):
         for g in gap:
             for f in folder:
                 print("===> Runing {}, gap {}".format(f, g))
-                mode = "raft-things.pth"  # model
+                # mode = "raft-things.pth"  # model works ok
+                # mode = "raft-chairs.pth"  # model actually horrible
+                # mode = "raft-small.pth"  # model cannot be used
+                mode = "raft-sintel.pth"  # model works ok
+                # mode = "raft-kitti.pth"  # model works poorly
                 if r == 1:
                     raw_outroot = data_path + "/Flows_gap-{}/".format(
                         g

@@ -26,7 +26,7 @@ def main(args):
 
     print(f"data_path: {data_path}")
 
-    img_flo_path = data_path + "/FlowImages_gap-1"  # path to the dataset
+    img_flo_path = data_path + "/FlowImages_gap1"  # path to the dataset
     superfolder = glob.glob(os.path.join(img_flo_path, "*"))
 
     centroids_root = data_path + f"/Centroids/"
