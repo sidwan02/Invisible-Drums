@@ -24,6 +24,8 @@ def save_video_frames(args):
     while read_success:
         if frame_count % args.skip == 0:
             # save curr frame as jpg (e.g. 0.jpg, 1.jpg, etc)
+            image = cv2.resize(image, (856, 480), cv2.INTER_NEAREST)
+
             cv2.imwrite("{}/{}.jpg".format(args.new_dir_name, frames_written), image)
             # read new frame
             print(f"Read frame {frame_count}")
@@ -39,9 +41,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--new_dir_name", type=str, default="./data/custom/JPEGImages/Anish-Slow/"
     )
-    parser.add_argument(
-        "--skip", type=int, default=5
-    )
+    parser.add_argument("--skip", type=int, default=5)
     parser.add_argument("--clear", action=BooleanOptionalAction)
 
     args = parser.parse_args()
