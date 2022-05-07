@@ -30,9 +30,7 @@ def save_video_frames(args):
 if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument(
-        "--video_path", type=str, default="./Videos/Anish-Slow.mp4"
-    )
+    parser.add_argument("--video_path", type=str, default="./Videos/Anish-Slow.mp4")
     parser.add_argument(
         "--new_dir_name", type=str, default="./data/custom/JPEGImages/Anish-Slow/"
     )
