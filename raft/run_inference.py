@@ -21,10 +21,10 @@ def run_inference(args):
         for g in gap:
             for f in folder:
                 print("===> Runing {}, gap {}".format(f, g))
-                # mode = "raft-things.pth"  # model works ok
+                mode = "raft-things.pth"  # model works ok
                 # mode = "raft-chairs.pth"  # model actually horrible
                 # mode = "raft-small.pth"  # model cannot be used
-                mode = "raft-sintel.pth"  # model works ok
+                # mode = "raft-sintel.pth"  # model works ok
                 # mode = "raft-kitti.pth"  # model works poorly
                 if r == 1:
                     raw_outroot = data_path + "/Flows_gap-{}/".format(
