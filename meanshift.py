@@ -140,10 +140,16 @@ def mean_shift_custom(
 
             b = surrounding_avg_intensity(points_radii[i]).astype("float64")
 
-            b[b > 200] *= 10
-            b[b > 150] *= 10
-            b[b > 100] *= 10
-            b[b > 50] *= 10
+            for j in range(250, 0, -20):
+                b[b > j] *= 10
+                # continue
+            # print(i)
+
+            # b[b > 200] *= 10
+            # b[b > 150] *= 10
+            # b[b > 100] *= 10
+            # b[b > 50] *= 10
+
             # b[b < 100] *= 0.1
 
             # this is to weight the more intense regions more
