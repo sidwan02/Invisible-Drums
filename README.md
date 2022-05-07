@@ -28,3 +28,9 @@ Example:
 ```
 python centroids.py --clear
 ```
+
+## Convert Video into Frames
+
+```
+python preprocessing.py --clear
+```
