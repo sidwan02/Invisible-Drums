@@ -24,7 +24,9 @@ def aggregate_centroids(centroid_locations, centroid_intensities):
         list
     )  # map from blob ID/label to its centroid's intensity (0-255)
     for blob_id, cluster_intensity in zip(clustering.labels_, centroid_intensities):
-        blob_intensities[blob_id].append(cluster_intensity)  # default 0
+        blob_intensities[int(blob_id)].append(int(cluster_intensity))  # default 0
+        # need to make int so that json dump can recornie it since json dump needs the kkeys to be int not int64/32
+        # can't do astype int since that is by default int 32
 
     # # iterate over map to get avg blob intensity
     # blob_avg_intensities = []

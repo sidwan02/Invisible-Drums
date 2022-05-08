@@ -1,9 +1,10 @@
 import numpy as np
+import json
+from collections import defaultdict
 
-a = np.array([1, 2, 3, 4])
+a = defaultdict(int)
 
-a[a > 3] *= 2
-a[a > 2] *= 2
-a[a > 1] *= 2
+# a = np.array([{"hi": 1}, 2, 3, 4]).tolist()
 
-print(a)
+with open("thing.json", "w") as f:
+    json.dump(a, f)

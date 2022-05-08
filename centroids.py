@@ -12,6 +12,7 @@ from main import run_single_iteration
 import shutil
 from multiprocessing import Pool
 from itertools import repeat
+import json
 
 
 def load_image(imfile, resolution=None):
@@ -57,10 +58,13 @@ def thing(args):
     )
 
     print(f"Meanshift Completed: {os.path.basename(svfile)}")
+    print(f"blobs_data: {blobs_data}")
 
     # all_blobs_data.append(blobs_data) =================
 
-    np.save(blobs_data_path[:-4] + "-blobs_data.npy", blobs_data)
+    # np.save(blobs_data_path[:-4] + "-blobs_data.npy", blobs_data)
+    with open(blobs_data_path[:-4] + "-blobs_data.json", "w") as f:
+        json.dump(blobs_data, f)
 
 
 def main(args):
@@ -117,7 +121,6 @@ def main(args):
 
         # zipped = zip(images, )
 
-        """
         pool = Pool()
         pool.map(
             thing,
@@ -129,7 +132,6 @@ def main(args):
                 repeat(blobs_data_dir_path),
             ),
         )
-        """
 
         # blobs_data_folders.append(all_blobs_data) =================
         # flow_grayscale_folders.append(all_flow_grayscale)
@@ -146,7 +148,8 @@ def main(args):
     all_folders_blobs_data = []
     for folder in blob_data_superfolder:
         folder_blob_data = []
-        npy_path = os.path.join(folder, "*.npy")
+        # npy_path = os.path.join(folder, "*.npy")
+        npy_path = os.path.join(folder, "*.json")
 
         # print(f"npy_path: {npy_path}")
 
@@ -154,8 +157,13 @@ def main(args):
         # print(f"folder_blob_data_paths: {folder_blob_data_paths}")
 
         for blob_data_path in folder_blob_data_paths:
-            blob_data = np.load(blob_data_path, allow_pickle=True)
+            # blob_data = np.load(blob_data_path, allow_pickle=True)
+            # folder_blob_data.append(blob_data)
+
+            f = open(blob_data_path)
+            blob_data = json.load(f)
             folder_blob_data.append(blob_data)
+            f.close()
 
         all_folders_blobs_data.append(folder_blob_data)
 

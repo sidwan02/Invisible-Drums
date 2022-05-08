@@ -51,7 +51,7 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     # print(f"curr_confidence_score: {curr_confidence_score}")
 
     return {
-        "blob_locs": blob_locs,
+        "blob_locs": blob_locs.tolist(),
         "blob_intensities": blob_intensities,
         "curr_confidence_score": curr_confidence_score,
     }
@@ -68,6 +68,8 @@ def rebound_detection(frame_blob_data, iter_num):
         Nothing
     """
     print("== VIDEO ", iter_num, " ==")
+
+    print(f"frame_blob_data: {frame_blob_data.shape}")
 
     blob_locs, blob_intensities, curr_confidence_score, = (
         frame_blob_data["blob_locs"],
@@ -164,7 +166,7 @@ if __name__ == "__main__":
     all_blobs_data = np.load(args.path + "all_blobs_data.npy", allow_pickle=True)
     # all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
 
-    print(f"all_blobs_data: ", all_blobs_data)
+    # print(f"all_blobs_data: ", all_blobs_data)
 
     # dim 1 -> folder/video
     # dim 2 -> frame
