@@ -121,6 +121,7 @@ def main(args):
 
         # zipped = zip(images, )
 
+        """
         pool = Pool()
         pool.map(
             thing,
@@ -132,6 +133,7 @@ def main(args):
                 repeat(blobs_data_dir_path),
             ),
         )
+        """
 
         # blobs_data_folders.append(all_blobs_data) =================
         # flow_grayscale_folders.append(all_flow_grayscale)
@@ -147,7 +149,7 @@ def main(args):
 
     all_folders_blobs_data = []
     for folder in blob_data_superfolder:
-        folder_blob_data = []
+        folder_blob_data = {}
         # npy_path = os.path.join(folder, "*.npy")
         json_path = os.path.join(folder, "*.json")
 
@@ -162,7 +164,13 @@ def main(args):
 
             f = open(blob_data_path)
             blob_data = json.load(f)
-            folder_blob_data.append(blob_data)
+            # folder_blob_data.append(blob_data)
+
+            s = "-blobs_data.json"
+            num = int(os.path.basename(blob_data_path)[: -len(s)])
+            print(f"num: {num}")
+
+            folder_blob_data[num] = blob_data
             f.close()
 
         all_folders_blobs_data.append(folder_blob_data)

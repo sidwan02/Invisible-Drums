@@ -78,7 +78,7 @@ def rebound_detection(frame_blob_data, iter_num):
         frame_blob_data["curr_confidence_score"],
     )
 
-    print(f"blob_intensities: {blob_intensities}")
+    # print(f"blob_intensities: {blob_intensities}")
 
     # update state of prev scores
     n_prev_scores.append(curr_confidence_score)
@@ -196,6 +196,8 @@ if __name__ == "__main__":
         m_prev_scores = []  # scalar list
         prev_potential_rebounds = []  # boolean list
         # get clusters for each RAFT frame for the current video
-        for iter_num, frame_blob_data in enumerate(video):
+        # for iter_num, frame_blob_data in enumerate(video):
+        for iter_num in range(len(video)):
             # frame_clusters is of type [[r,c,intensity], ...]
-            rebound_detection(frame_blob_data, iter_num)
+            if str(iter_num) in video:
+                rebound_detection(video[str(iter_num)], iter_num)
