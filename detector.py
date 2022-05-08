@@ -76,27 +76,28 @@ def get_drum_id(img_size_x, img_size_y, location):
     elif(X > img_size_x / 2 and Y > img_size_y / 2):
         return 4
 
+if __name__ == "__main__":
 
-## TESTING
+    ## TESTING
 
-curr_confidence_score = np.array(40)
-n_prev_scores= np.array([50,40,60]) 
-curr_blob_centroid_pix_locs = np.array([
-    [20,10],
-    [100,90],
-    [500,450],
-])
-intensities = [4, 90, 200] 
-threshold = 35
+    curr_confidence_score = np.array(40)
+    n_prev_scores= np.array([50,40,60]) 
+    curr_blob_centroid_pix_locs = np.array([
+        [20,10],
+        [100,90],
+        [500,450],
+    ])
+    intensities = [4, 90, 200] 
+    threshold = 35
 
 
 
-curr_frame_has_potential_rebound, highest_intensity_pixel_loc = detect_potential_rebound(curr_confidence_score, n_prev_scores, curr_blob_centroid_pix_locs, intensities, threshold)
-print("potential rebound: ", curr_frame_has_potential_rebound)
+    curr_frame_has_potential_rebound, highest_intensity_pixel_loc = detect_potential_rebound(curr_confidence_score, n_prev_scores, curr_blob_centroid_pix_locs, intensities, threshold)
+    print("potential rebound: ", curr_frame_has_potential_rebound)
 
-prev_potential_rebounds = [False, True, True, False, True, False]
-m_prev_scores= np.array([30,20,30,10]) 
-rebound_location = detect_rebound(
-    curr_confidence_score, m_prev_scores, prev_potential_rebounds, curr_blob_centroid_pix_locs, intensities, threshold
-)
-print("rebound loc: ", rebound_location)
+    prev_potential_rebounds = [False, True, True, False, True, False]
+    m_prev_scores= np.array([30,20,30,10]) 
+    rebound_location = detect_rebound(
+        curr_confidence_score, m_prev_scores, prev_potential_rebounds, curr_blob_centroid_pix_locs, intensities, threshold
+    )
+    print("rebound loc: ", rebound_location)

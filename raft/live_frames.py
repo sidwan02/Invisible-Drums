@@ -31,9 +31,7 @@ def main(args):
         image_flow = predict_live(args, prev_frame, frame)
 
         if image_flow is not None:
-            image_flow = cv2.resize(
-                image_flow, (orig_shape[1], orig_shape[0]), cv2.INTER_NEAREST
-            )
+            image_flow = cv2.resize(image_flow, (856, 480), cv2.INTER_NEAREST)
             cv2.imshow("Image Flow", image_flow)
 
         prev_frame = frame

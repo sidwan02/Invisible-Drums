@@ -106,7 +106,7 @@ def mean_shift_custom(
     cur_iter = 1
 
     while cur_iter <= n_iter:
-        print(f"cur_iter: {cur_iter}; avg radius: {np.average(points_radii)}")
+        # print(f"cur_iter: {cur_iter}; avg radius: {np.average(points_radii)}")
 
         for i, (r, c) in enumerate(points):
             r, c = round(r), round(c)
