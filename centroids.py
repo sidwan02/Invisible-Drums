@@ -35,7 +35,7 @@ def thing(args):
     image1 = np.array(load_image(imfile1))
     svfile = imfile1
 
-    print(f"Meanshift Starting... : {os.path.basename(svfile)}")
+    print(f"Meanshift Starting...: {os.path.basename(svfile)}")
 
     centroids_path = os.path.join(centroids_dir_path, os.path.basename(svfile))
     meanshift_path = os.path.join(meanshift_dir_path, os.path.basename(svfile))
@@ -56,11 +56,11 @@ def thing(args):
         cluster_centers, grayscale, blobs_path=blobs_path[:-4] + "-blobs.png"
     )
 
-    print(f"Meanshift Completed : {os.path.basename(svfile)}")
+    print(f"Meanshift Completed: {os.path.basename(svfile)}")
 
     # all_blobs_data.append(blobs_data) =================
 
-    np.save(blobs_data_dir_path[:-4] + "-blobs_data.npy", blobs_data)
+    np.save(blobs_data_path[:-4] + "-blobs_data.npy", blobs_data)
 
 
 def main(args):
@@ -117,6 +117,7 @@ def main(args):
 
         # zipped = zip(images, )
 
+        """
         pool = Pool()
         pool.map(
             thing,
@@ -128,6 +129,7 @@ def main(args):
                 repeat(blobs_data_dir_path),
             ),
         )
+        """
 
         # blobs_data_folders.append(all_blobs_data) =================
         # flow_grayscale_folders.append(all_flow_grayscale)
@@ -136,11 +138,20 @@ def main(args):
         # print(cluster_centers_folders)
         # return cluster_centers_folders
 
+    blob_data_path = data_path + "/Blobs-Data"
+    blob_data_superfolder = glob.glob(os.path.join(blob_data_path, "*"))
+
+    # print(f"blob_data_superfolder: {blob_data_superfolder}")
+
     all_folders_blobs_data = []
-    for folder in superfolder:
+    for folder in blob_data_superfolder:
         folder_blob_data = []
         npy_path = os.path.join(folder, "*.npy")
+
+        # print(f"npy_path: {npy_path}")
+
         folder_blob_data_paths = glob.glob(npy_path)
+        # print(f"folder_blob_data_paths: {folder_blob_data_paths}")
 
         for blob_data_path in folder_blob_data_paths:
             blob_data = np.load(blob_data_path, allow_pickle=True)

@@ -46,9 +46,9 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
 
         cv2.imwrite(blobs_path, blobs_on_flow)
 
-    print(f"blob_locs: {blob_locs}")
-    print(f"blob_intensities: {blob_intensities}")
-    print(f"curr_confidence_score: {curr_confidence_score}")
+    # print(f"blob_locs: {blob_locs}")
+    # print(f"blob_intensities: {blob_intensities}")
+    # print(f"curr_confidence_score: {curr_confidence_score}")
 
     return {
         "blob_locs": blob_locs,
@@ -160,10 +160,11 @@ if __name__ == "__main__":
     # See README.md: Get Maximal Intensity Centroids
 
     # all_centroid_data = get_centroids()
+
     all_blobs_data = np.load(args.path + "all_blobs_data.npy", allow_pickle=True)
     # all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
 
-    # print(f"all_blobs_data: ", all_blobs_data)
+    print(f"all_blobs_data: ", all_blobs_data)
 
     # dim 1 -> folder/video
     # dim 2 -> frame
