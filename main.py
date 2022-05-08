@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from meanshift import mark_centroids
 import copy
 import cv2
+import json
 
 
 def mark_blobs(grayscale, blob_centers, blob_intensities):
@@ -69,7 +70,7 @@ def rebound_detection(frame_blob_data, iter_num):
     """
     print("== VIDEO ", iter_num, " ==")
 
-    print(f"frame_blob_data: {frame_blob_data.shape}")
+    # print(f"frame_blob_data: {frame_blob_data}")
 
     blob_locs, blob_intensities, curr_confidence_score, = (
         frame_blob_data["blob_locs"],
@@ -163,7 +164,12 @@ if __name__ == "__main__":
 
     # all_centroid_data = get_centroids()
 
-    all_blobs_data = np.load(args.path + "all_blobs_data.npy", allow_pickle=True)
+    # all_blobs_data = np.load(args.path + "all_blobs_data.npy", allow_pickle=True)
+
+    f = open(args.path + "all_blobs_data.json")
+    all_blobs_data = json.load(f)
+    f.close()
+
     # all_flow_grayscale = np.load(args.path + "all_flow_grayscale.npy")
 
     # print(f"all_blobs_data: ", all_blobs_data)

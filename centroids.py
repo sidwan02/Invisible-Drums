@@ -58,7 +58,7 @@ def thing(args):
     )
 
     print(f"Meanshift Completed: {os.path.basename(svfile)}")
-    print(f"blobs_data: {blobs_data}")
+    # print(f"blobs_data: {blobs_data}")
 
     # all_blobs_data.append(blobs_data) =================
 
@@ -149,11 +149,11 @@ def main(args):
     for folder in blob_data_superfolder:
         folder_blob_data = []
         # npy_path = os.path.join(folder, "*.npy")
-        npy_path = os.path.join(folder, "*.json")
+        json_path = os.path.join(folder, "*.json")
 
-        # print(f"npy_path: {npy_path}")
+        print(f"json_path: {json_path}")
 
-        folder_blob_data_paths = glob.glob(npy_path)
+        folder_blob_data_paths = glob.glob(json_path)
         # print(f"folder_blob_data_paths: {folder_blob_data_paths}")
 
         for blob_data_path in folder_blob_data_paths:
@@ -167,7 +167,9 @@ def main(args):
 
         all_folders_blobs_data.append(folder_blob_data)
 
-    np.save(data_path + "/all_blobs_data.npy", all_folders_blobs_data)
+    # np.save(data_path + "/all_blobs_data.npy", all_folders_blobs_data)
+    with open(data_path + "/all_blobs_data.json", "w") as f:
+        json.dump(all_folders_blobs_data, f)
 
 
 if __name__ == "__main__":
