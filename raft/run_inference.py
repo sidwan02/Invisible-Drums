@@ -6,11 +6,11 @@ from argparse import ArgumentParser, BooleanOptionalAction
 def run_inference(args):
     data_path = args.path
     # data_path = "../data/DAVIS2016"
-    # gap = [1, 2]
-    # reverse = [0, 1]
+    gap = [1, 2]
+    reverse = [0, 1]
 
-    gap = [1]
-    reverse = [0]
+    # gap = [1]
+    # reverse = [0]
 
     rgbpath = data_path + "/JPEGImages"  # path to the dataset
     folder = gb.glob(os.path.join(rgbpath, "*"))
