@@ -32,22 +32,31 @@ OUTPUTS:
 If we have a rebound then it returns the (x, y) pixel location of rebound. If there is no rebound then 
 we just return None
 """
-def detect_rebound(curr_confidence_score, previous_scores, previous_rebounds, locations, intensities, threshold=0.5):
+def detect_rebound(curr_confidence_score, previous_scores, previous_rebounds, locations, intensities, current_scores, idx, threshold=17):
     # getting potential_rebound_percent
-    potential_rebound_percent = np.count_nonzero(previous_rebounds) / np.shape(previous_rebounds)[0]
+    potential_rebound_percent = np.count_nonzero(previous_rebounds) / np.shape(previous_scores)[0]
 
     # check if the current score is greater than all m previous scores, m=hyperparameter
-    curr_score_above_m_prev_scores = previous_scores[curr_confidence_score >= previous_scores].size == previous_scores.size
-    # is_greater = True
-    # for score in previous_scores:
-    #     if score > curr_confidence_score:
-    #         is_greater = False
-
+    curr_score_above_m_prev_scores = previous_scores[curr_confidence_score <= previous_scores].size == previous_scores.size
+    check_window_smallest = False
+    window = 10
+    window_start = idx
+    window_end = idx
+    if window_start - window < 0:
+        window_start = 0
+    else:
+        window_start = idx - window
+    if window_end  + window >= len(current_scores):
+        window_end = len(current_scores) - 1
+    else:
+        window_end = idx + window
+    window_scores = np.array(current_scores[window_start:window_end])
+    curr_score_window_check= np.all(curr_confidence_score <= window_scores)
     # checking if all conditions for a rebound pass
-    print("curr confidence above: ", curr_confidence_score > threshold)
-    print("<30% pot reb: ", potential_rebound_percent > 0.3)
-    print("curr confidence above: ", curr_confidence_score > threshold)
-    if (curr_confidence_score > threshold) and (potential_rebound_percent > 0.3) and curr_score_above_m_prev_scores:
+    # print("curr confidence above: ", curr_confidence_score > threshold)
+    # print("<30% pot reb: ", potential_rebound_percent > 0.3)
+    # print("curr confidence above: ", curr_confidence_score > threshold)
+    if (curr_confidence_score < threshold) and (potential_rebound_percent > 0.12) and (curr_score_above_m_prev_scores and curr_score_window_check):
         max_intensity_location = locations[np.argmax(intensities)]
         return max_intensity_location
 

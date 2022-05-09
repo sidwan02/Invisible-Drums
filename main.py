@@ -58,7 +58,7 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     }
 
 
-def rebound_detection(frame_blob_data, iter_num):
+def rebound_detection(frame_blob_data, iter_num, current_scores):
     """
     runs our system for a single iteration
 
@@ -68,7 +68,7 @@ def rebound_detection(frame_blob_data, iter_num):
     Returns
         Nothing
     """
-    print("== VIDEO ", iter_num, " ==")
+    # print("== VIDEO ", iter_num, " ==")
 
     # print(f"frame_blob_data: {frame_blob_data}")
 
@@ -111,27 +111,31 @@ def rebound_detection(frame_blob_data, iter_num):
     prev_potential_rebounds.append(curr_frame_has_potential_rebound)
     if len(prev_potential_rebounds) == 2 * n + 1:  # keep length at most 2n
         prev_potential_rebounds.pop(0)
+    if curr_frame_has_potential_rebound:
 
-    # step 5: detect rebound
-    rebound_location = detect_rebound(
-        curr_confidence_score,
-        np.array(m_prev_scores[:-1]),
-        prev_potential_rebounds,
-        blob_locs,
-        blob_intensities,
-        threshold=T,
-    )
+        # step 5: detect rebound
+        rebound_location = detect_rebound(
+            curr_confidence_score,
+            np.array(m_prev_scores[:-1]),
+            prev_potential_rebounds,
+            blob_locs,
+            blob_intensities,
+            current_scores,
+            iter_num,
+            threshold=T
+        )
+        #print(f"rebound_location: {rebound_location}")
+        if rebound_location is not None:
+            print("== VIDEO ", iter_num, " ==")
+            print(" current confidence score:", curr_confidence_score)
+            print("blob_locs", highest_intensity_pixel_loc)
+            # step 6: get sound effect ID based on rebound location and play the sound
+            drum_sound_id = get_drum_id(img_size_x, img_size_y, rebound_location)
+            print("drum id: ", drum_sound_id)
+            # TODO: somehow sync drum sound with video in a mp4 or live??
+            # play_sound(drum_sound_id)
 
-    print(f"rebound_location: {rebound_location}")
-
-    if rebound_location is not None:
-        # step 6: get sound effect ID based on rebound location and play the sound
-        drum_sound_id = get_drum_id(img_size_x, img_size_y, rebound_location)
-        print("drum id: ", drum_sound_id)
-        # TODO: somehow sync drum sound with video in a mp4 or live??
-        # play_sound(drum_sound_id)
-
-        # (step 7): if we have a rebound, prevent a rebound in the next 5-10 frames?
+            # (step 7): if we have a rebound, prevent a rebound in the next 5-10 frames?
 
     return
 
@@ -146,9 +150,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--path", type=str, default="./data/custom/")
     # set parameters
-    parser.add_argument("--n", type=int, default=3)
-    parser.add_argument("--m", type=int, default=3)
-    parser.add_argument("--T", type=int, default=50)
+    parser.add_argument("--n", type=int, default=2)
+    parser.add_argument("--m", type=int, default=4)
+    parser.add_argument("--T", type=int, default=39)
 
     args = parser.parse_args()
 
@@ -183,7 +187,11 @@ if __name__ == "__main__":
     # intensity:
     # 0 => 0 velocity
     # 255 => highest velocity
-
+    current_scores = []
+    for video in all_blobs_data[0].keys():
+        current_scores.append([int(video),all_blobs_data[0][video]])
+    current_scores.sort(key = lambda current_scores: current_scores[0])
+    current_scores = [(i[1]["curr_confidence_score"]) for i in current_scores]
     # each folder represents a video
     for video in all_blobs_data:
         # TODO: set img size of this video (for get_drum_id())
@@ -200,4 +208,4 @@ if __name__ == "__main__":
         for iter_num in range(len(video)):
             # frame_clusters is of type [[r,c,intensity], ...]
             if str(iter_num) in video:
-                rebound_detection(video[str(iter_num)], iter_num)
+                rebound_detection(video[str(iter_num)], iter_num, current_scores)
