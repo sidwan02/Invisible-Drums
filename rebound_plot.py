@@ -42,6 +42,17 @@ if __name__ == "__main__":
         shutil.rmtree(rebound_dir_path)
     os.makedirs(rebound_dir_path, exist_ok=True)
 
-    rebound_locs = [{"frame": "0", "loc": [0, 0]}]
+    rebound_locs = [
+        {"frame": "15", "loc": [301.0, 489.0]},
+        {"frame": "52", "loc": [159.28571428571428, 430.0]},
+        {"frame": "76", "loc": [225.0, 455.0]},
+        {"frame": "89", "loc": [358.0, 291.0]},
+        {"frame": "106", "loc": [449.7368421052632, 433.3157894736842]},
+        {"frame": "119", "loc": [284.0, 338.0]},
+        {"frame": "140", "loc": [135.0, 506.0]},
+        {"frame": "169", "loc": [209.0, 427.0]},
+        {"frame": "189", "loc": [239.53846153846155, 348.53846153846155]},
+        {"frame": "199", "loc": [431.54545454545456, 183.1818181818182]},
+    ]
     rebound_plot(args, rebound_locs)
 
