@@ -1,4 +1,5 @@
 import numpy as np
+from pygame import mixer
 
 """
 function that helps in detect of a (POTENTIAL) rebound took place. 
@@ -39,7 +40,7 @@ def detect_rebound(curr_confidence_score, previous_scores, previous_rebounds, lo
     # check if the current score is greater than all m previous scores, m=hyperparameter
     curr_score_above_m_prev_scores = previous_scores[curr_confidence_score <= previous_scores].size == previous_scores.size
     check_window_smallest = False
-    window = 10
+    window = 14
     window_start = idx
     window_end = idx
     if window_start - window < 0:
@@ -76,14 +77,14 @@ OUTPUTS:
 def get_drum_id(img_size_x, img_size_y, location):
     X = location[0]
     Y = location[1]
-    if(X < img_size_x / 2 and Y > img_size_y / 2):
-        return 1
-    elif(X < img_size_x / 2 and Y < img_size_y / 2):
-        return 2
-    elif(X > img_size_x / 2 and Y < img_size_y / 2):
-        return 3
-    elif(X > img_size_x / 2 and Y > img_size_y / 2):
-        return 4
+    if(X < 150 and Y < 300):
+        return "/Users/anishansupradhan/Desktop/CS1430/Invisible-Drums/1.mp3"
+    elif(X > 400 and Y < 300):
+        return "/Users/anishansupradhan/Desktop/CS1430/Invisible-Drums/2.mp3"
+    elif(X < 100 and Y > 475):
+        return "/Users/anishansupradhan/Desktop/CS1430/Invisible-Drums/3.mp3"
+    elif(X > 400 and Y > 475):
+        return "/Users/anishansupradhan/Desktop/CS1430/Invisible-Drums/4.mp3"
 
 if __name__ == "__main__":
 

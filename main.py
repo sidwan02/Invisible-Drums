@@ -6,7 +6,8 @@ from meanshift import mark_centroids
 import copy
 import cv2
 import json
-
+from pygame import mixer
+from playsound import playsound
 
 def mark_blobs(grayscale, blob_centers, blob_intensities):
     orig = cv2.cvtColor(grayscale, cv2.COLOR_GRAY2RGB)
@@ -58,7 +59,7 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     }
 
 
-def rebound_detection(frame_blob_data, iter_num, current_scores):
+def rebound_detection(frame_blob_data, iter_num, current_scores, count, current_location):
     """
     runs our system for a single iteration
 
@@ -71,7 +72,6 @@ def rebound_detection(frame_blob_data, iter_num, current_scores):
     # print("== VIDEO ", iter_num, " ==")
 
     # print(f"frame_blob_data: {frame_blob_data}")
-
     blob_locs, blob_intensities, curr_confidence_score, = (
         frame_blob_data["blob_locs"],
         frame_blob_data["blob_intensities"],
@@ -83,19 +83,16 @@ def rebound_detection(frame_blob_data, iter_num, current_scores):
     # update state of prev scores
     n_prev_scores.append(curr_confidence_score)
     m_prev_scores.append(curr_confidence_score)
-
     # break and reiterate until we have at least max(m,n) scores
     if (
         len(n_prev_scores) < n + 1 or len(m_prev_scores) < m + 1
     ):  # add 1 because we pass in prev_scores[:-1] to rebound detectors
-        return
-
+        return count, current_location
     # keep length at most n or m previous scores by removing oldest entries (at start of arr)
     if len(n_prev_scores) > n + 1:
         n_prev_scores.pop(0)
     if len(m_prev_scores) > m + 1:
         m_prev_scores.pop(0)
-
     # step 4: detect potential rebound
     (
         curr_frame_has_potential_rebound,
@@ -107,6 +104,19 @@ def rebound_detection(frame_blob_data, iter_num, current_scores):
         blob_intensities,
         threshold=T,
     )
+    # print(count)
+    if count == 8:
+        # print("HELLO")
+        count = 0
+        current_location = highest_intensity_pixel_loc
+    if abs(current_location[0] - highest_intensity_pixel_loc[0]) < 10 and abs(current_location[1] - highest_intensity_pixel_loc[1]) < 10:
+        current_location = highest_intensity_pixel_loc
+        count = 0
+    # print(current_location)
+    count = count + 1
+    # print(highest_intensity_pixel_loc)
+
+    # print(highest_intensity_pixel_loc)
     # update state of prev rebounds (boolean list)
     prev_potential_rebounds.append(curr_frame_has_potential_rebound)
     if len(prev_potential_rebounds) == 2 * n + 1:  # keep length at most 2n
@@ -126,18 +136,27 @@ def rebound_detection(frame_blob_data, iter_num, current_scores):
         )
         #print(f"rebound_location: {rebound_location}")
         if rebound_location is not None:
-            print("== VIDEO ", iter_num, " ==")
-            print(" current confidence score:", curr_confidence_score)
-            print("blob_locs", highest_intensity_pixel_loc)
+            # print("== VIDEO ", iter_num, " ==")
+            # print(" current confidence score:", curr_confidence_score)
+            # print("blob_locs", highest_intensity_pixel_loc)
             # step 6: get sound effect ID based on rebound location and play the sound
-            drum_sound_id = get_drum_id(img_size_x, img_size_y, rebound_location)
+            drum_sound_id = get_drum_id(img_size_x, img_size_y, current_location)
+            print(iter_num)
+            print(highest_intensity_pixel_loc)
+            print(current_location)
+            print(drum_sound_id)
             print("drum id: ", drum_sound_id)
+            if drum_sound_id is not None:
+                playsound(drum_sound_id)
+            # mixer.init()
+            # mixer.music.load(drum_sound_id)
+            # mixer.music.play()
             # TODO: somehow sync drum sound with video in a mp4 or live??
             # play_sound(drum_sound_id)
 
             # (step 7): if we have a rebound, prevent a rebound in the next 5-10 frames?
+    return count, current_location
 
-    return
 
 
 import sys
@@ -205,7 +224,9 @@ if __name__ == "__main__":
         prev_potential_rebounds = []  # boolean list
         # get clusters for each RAFT frame for the current video
         # for iter_num, frame_blob_data in enumerate(video):
+        count = 1
+        current_location = (0, 0)
         for iter_num in range(len(video)):
             # frame_clusters is of type [[r,c,intensity], ...]
             if str(iter_num) in video:
-                rebound_detection(video[str(iter_num)], iter_num, current_scores)
+                count, current_location = rebound_detection(video[str(iter_num)], iter_num, current_scores, count, current_location)
