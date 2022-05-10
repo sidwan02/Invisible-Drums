@@ -6,8 +6,11 @@ from meanshift import mark_centroids
 import copy
 import cv2
 import json
-from pygame import mixer
-from playsound import playsound
+
+# from playsound import playsound
+from winsound import PlaySound
+import winsound
+
 
 def mark_blobs(grayscale, blob_centers, blob_intensities):
     orig = cv2.cvtColor(grayscale, cv2.COLOR_GRAY2RGB)
@@ -59,7 +62,9 @@ def run_single_iteration(cluster_centroids, frame_flow, blobs_path=None):
     }
 
 
-def rebound_detection(frame_blob_data, iter_num, current_scores, count, current_location):
+def rebound_detection(
+    frame_blob_data, iter_num, current_scores, count, current_location
+):
     """
     runs our system for a single iteration
 
@@ -109,7 +114,10 @@ def rebound_detection(frame_blob_data, iter_num, current_scores, count, current_
         # print("HELLO")
         count = 0
         current_location = highest_intensity_pixel_loc
-    if abs(current_location[0] - highest_intensity_pixel_loc[0]) < 10 and abs(current_location[1] - highest_intensity_pixel_loc[1]) < 10:
+    if (
+        abs(current_location[0] - highest_intensity_pixel_loc[0]) < 10
+        and abs(current_location[1] - highest_intensity_pixel_loc[1]) < 10
+    ):
         current_location = highest_intensity_pixel_loc
         count = 0
     # print(current_location)
@@ -132,9 +140,9 @@ def rebound_detection(frame_blob_data, iter_num, current_scores, count, current_
             blob_intensities,
             current_scores,
             iter_num,
-            threshold=T
+            threshold=T,
         )
-        #print(f"rebound_location: {rebound_location}")
+        # print(f"rebound_location: {rebound_location}")
         if rebound_location is not None:
             # print("== VIDEO ", iter_num, " ==")
             # print(" current confidence score:", curr_confidence_score)
@@ -147,7 +155,7 @@ def rebound_detection(frame_blob_data, iter_num, current_scores, count, current_
             print(drum_sound_id)
             print("drum id: ", drum_sound_id)
             if drum_sound_id is not None:
-                playsound(drum_sound_id)
+                PlaySound(drum_sound_id, winsound.SND_FILENAME)
             # mixer.init()
             # mixer.music.load(drum_sound_id)
             # mixer.music.play()
@@ -156,7 +164,6 @@ def rebound_detection(frame_blob_data, iter_num, current_scores, count, current_
 
             # (step 7): if we have a rebound, prevent a rebound in the next 5-10 frames?
     return count, current_location
-
 
 
 import sys
@@ -208,8 +215,8 @@ if __name__ == "__main__":
     # 255 => highest velocity
     current_scores = []
     for video in all_blobs_data[0].keys():
-        current_scores.append([int(video),all_blobs_data[0][video]])
-    current_scores.sort(key = lambda current_scores: current_scores[0])
+        current_scores.append([int(video), all_blobs_data[0][video]])
+    current_scores.sort(key=lambda current_scores: current_scores[0])
     current_scores = [(i[1]["curr_confidence_score"]) for i in current_scores]
     # each folder represents a video
     for video in all_blobs_data:
@@ -229,4 +236,11 @@ if __name__ == "__main__":
         for iter_num in range(len(video)):
             # frame_clusters is of type [[r,c,intensity], ...]
             if str(iter_num) in video:
-                count, current_location = rebound_detection(video[str(iter_num)], iter_num, current_scores, count, current_location)
+                count, current_location = rebound_detection(
+                    video[str(iter_num)],
+                    iter_num,
+                    current_scores,
+                    count,
+                    current_location,
+                )
+
